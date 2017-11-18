@@ -1,0 +1,32 @@
+{
+    "jira-setup": {
+        "jira_url": "",
+        "jira_user": "",
+        "jira_password": ""
+    },
+    "tempo-setup": {
+        "apikey": ""
+    },
+    "filtering": {
+        "account": "",
+        "hide-non-billable": true,
+        "month": 0,
+        "date_start": "",
+        "date_end": "",
+        "groupby": "project"
+    },
+    "billing-setup": {
+        "dev_rate": 0,
+        "mgmt_rate": 0,
+        "mgmt_usernames": [""]
+    },
+    "output": {
+        "col": "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount",
+        "sort": "Code",
+        "pretty": false
+    },
+    "advanced": {
+        "trim": "",
+        "split-po": false
+    }
+}
