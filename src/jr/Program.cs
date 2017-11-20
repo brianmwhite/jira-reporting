@@ -88,7 +88,7 @@ namespace jr
                 , userOptions.Output.Col
             );
 
-            return ts.GenerateSummaryText(workItems, ts);
+            return ts.GenerateSummaryText(workItems);
         }
 
         private static List<WorkItem> ExtractWorkItemsFromExcel(string inputSourceLocation)

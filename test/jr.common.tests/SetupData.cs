@@ -4,6 +4,41 @@ namespace jr.common.tests
 {
     public class SetupData
     {
+
+        public static List<string[]>  CreateStringArrayList() {
+            List<string[]> s = new List<string[]>();
+            s.Add(new string[] {"Project","Dev Hours","Dev Amount","Mgmt Hours","Mgmt Amount","Total Hours","Total Amount"});
+            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","54.50","$0.00","4.00","$0.00","58.50","$0.00"});
+            s.Add(new string[] {"Alpha Beta - Project 2 #ABC00006","12.00","$0.00","0.00","$0.00","12.00","$0.00"});
+            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","25.00","$0.00","1.50","$0.00","26.50","$0.00"});
+            s.Add(new string[] {"Alpha Beta - Project 4 #ABC00004","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new string[] {"Total","92.00","$0.00","5.50","$0.00","97.50","$0.00"});
+            return s;
+        }
+
+        public static List<SummarizedItem> CreateSummarizedItemList()
+        {
+            List<SummarizedItem> si = new List<SummarizedItem>();
+            AddSummarizedItemDataRows(si);
+            return si;
+        }
+
+        public static List<SummarizedItem> CreateSummarizedItemListWithTotals()
+        {
+            List<SummarizedItem> si = new List<SummarizedItem>();
+            AddSummarizedItemDataRows(si);
+            si.Add(new SummarizedItem() { project = "Total", dev_rate = 0, mgmt_rate = 0, dev_hours = 92, mgmt_hours = 5.5 });
+            return si;
+        }
+
+        private static void AddSummarizedItemDataRows(List<SummarizedItem> si)
+        {
+            si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", dev_rate = 0, mgmt_rate = 0, dev_hours = 54.5, mgmt_hours = 4 });
+            si.Add(new SummarizedItem() { project = "Alpha Beta - Project 2 #ABC00006", dev_rate = 0, mgmt_rate = 0, dev_hours = 12, mgmt_hours = 0.00 });
+            si.Add(new SummarizedItem() { project = "Alpha Beta - Project 3 #ABC00008", dev_rate = 0, mgmt_rate = 0, dev_hours = 25, mgmt_hours = 1.50 });
+            si.Add(new SummarizedItem() { project = "Alpha Beta - Project 4 #ABC00004", dev_rate = 0, mgmt_rate = 0, dev_hours = 0.5, mgmt_hours = 0.00 });
+        }
+
         public static List<WorkItem> CreateWorkItemList()
         {
             // Used in the ExcelInput.cs to generate data

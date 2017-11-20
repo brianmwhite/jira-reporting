@@ -31,13 +31,14 @@ namespace jr.common
             }
             this.splitPO = _splitPO;
             this.projectTextToTrim = _projectTextToTrim;
-            this.outputColumns = _outputColumns;
+            this.outputColumns = string.IsNullOrEmpty(_outputColumns) ? "Project,Code,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount" : _outputColumns;
         }
 
-        public string GenerateSummaryText(List<WorkItem> workItems, TimeSummarization ts)
+        public string GenerateSummaryText(List<WorkItem> workItems)
         {
-            List<SummarizedItem> si = ts.SummarizeWorkItems(workItems);
-            List<string[]> dataTable = ts.GenerateOutputData(si, outputColumns);
+            List<SummarizedItem> si = this.SummarizeWorkItems(workItems);
+            si.Add(AddSummarizedTotal(si));
+            List<string[]> dataTable = this.GenerateOutputData(si);
             return TimeSummarization.GenerateSeparatedValueTextOutput(dataTable, '\t');
         }
 
@@ -60,6 +61,11 @@ namespace jr.common
                 .ThenBy(x => x.project)
                 .ToList();
 
+            return _summarizedWorkItems;
+        }
+
+        private SummarizedItem AddSummarizedTotal(List<SummarizedItem> _summarizedWorkItems)
+        {
             SummarizedItem totalRow = new SummarizedItem()
             {
                 project = "Total",
@@ -69,19 +75,13 @@ namespace jr.common
                 mgmt_hours = _summarizedWorkItems.Sum(x => x.mgmt_hours),
             };
 
-            _summarizedWorkItems.Add(totalRow);
-
-            return _summarizedWorkItems;
+            return totalRow;
         }
-        public List<string[]> GenerateOutputData(List<SummarizedItem> _summarizedWorkItems, string columnMapString = "")
-        {
-            if (string.IsNullOrEmpty(columnMapString))
-            {
-                columnMapString = "Project,Code,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount";
-            }
 
+        public List<string[]> GenerateOutputData(List<SummarizedItem> _summarizedWorkItems)
+        {
             OrderedDictionary columnMap = new OrderedDictionary();
-            string[] columnFields = columnMapString.Split(',');
+            string[] columnFields = outputColumns.Split(',');
 
             List<string[]> dataTable = new List<string[]>();
 
