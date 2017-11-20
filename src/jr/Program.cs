@@ -80,16 +80,15 @@ namespace jr
             List<WorkItem> workItems = ExtractWorkItemsFromExcel(inputSourceLocation);
 
             TimeSummarization ts = new TimeSummarization(
-                workItems
-                , userOptions.BillingSetup.DevRate
+                  userOptions.BillingSetup.DevRate
                 , userOptions.BillingSetup.MgmtRate
                 , userOptions.BillingSetup.MgmtUsernames
                 , userOptions.Advanced.SplitPo
                 , userOptions.Advanced.Trim
+                , userOptions.Output.Col
             );
 
-            ts.SummarizeWorkItems();
-            return ts.GenerateSeparatedValueTextOutput('\t', userOptions.Output.Col);
+            return ts.GenerateSummaryText(workItems, ts);
         }
 
         private static List<WorkItem> ExtractWorkItemsFromExcel(string inputSourceLocation)

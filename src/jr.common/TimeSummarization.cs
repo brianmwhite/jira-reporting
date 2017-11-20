@@ -9,17 +9,16 @@ namespace jr.common
 {
     public class TimeSummarization
     {
-        private List<WorkItem> workItems;
         private double devRate;
         private double mgmtRate;
         private string[] mgmtUsers;
         private bool splitPO;
         private string projectTextToTrim;
-        private List<SummarizedItem> _summarizedWorkItems;
 
-        public TimeSummarization(List<WorkItem> _workItems, double _devRate, double _mgmtRate, string[] _mgmtUsers, bool _splitPO, string _projectTextToTrim)
+        private string outputColumns;
+
+        public TimeSummarization(double _devRate, double _mgmtRate, string[] _mgmtUsers, bool _splitPO, string _projectTextToTrim, string _outputColumns = "")
         {
-            this.workItems = _workItems;
             this.devRate = _devRate;
             this.mgmtRate = _mgmtRate;
             if (_mgmtUsers is null)
@@ -32,11 +31,20 @@ namespace jr.common
             }
             this.splitPO = _splitPO;
             this.projectTextToTrim = _projectTextToTrim;
+            this.outputColumns = _outputColumns;
         }
 
-        public void SummarizeWorkItems()
+        public string GenerateSummaryText(List<WorkItem> workItems, TimeSummarization ts)
         {
-            _summarizedWorkItems = workItems
+            List<SummarizedItem> si = ts.SummarizeWorkItems(workItems);
+            List<string[]> dataTable = ts.GenerateOutputData(si, outputColumns);
+            return TimeSummarization.GenerateSeparatedValueTextOutput(dataTable, '\t');
+        }
+
+        public List<SummarizedItem> SummarizeWorkItems(List<WorkItem> _workItems)
+        {
+            List<SummarizedItem> _summarizedWorkItems = new List<SummarizedItem>();
+            _summarizedWorkItems = _workItems
                 .Where(x => x.billedHours > 0)
                 .GroupBy(x => x.project)
                 .Select(x => new SummarizedItem(splitPO, projectTextToTrim)
@@ -62,8 +70,10 @@ namespace jr.common
             };
 
             _summarizedWorkItems.Add(totalRow);
+
+            return _summarizedWorkItems;
         }
-        public List<string[]> GenerateOutputData(string columnMapString = "") {
+        public List<string[]> GenerateOutputData(List<SummarizedItem> _summarizedWorkItems, string columnMapString = "") {
             if (string.IsNullOrEmpty(columnMapString))
             {
                 columnMapString = "Project,Code,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount";
@@ -131,10 +141,9 @@ namespace jr.common
             }            
             return dataTable;
         }
-
-        public string GenerateSeparatedValueTextOutput(char fieldSeparator, string columnMapString = "")
+        
+        public static string GenerateSeparatedValueTextOutput(List<string[]> dataTable, char fieldSeparator)
         {
-            var dataTable = GenerateOutputData(columnMapString);
             StringBuilder output = new StringBuilder();
             for (int rowNum = 0;rowNum<dataTable.Count;rowNum++) {
                 string newList = string
