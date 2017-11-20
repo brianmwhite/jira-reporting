@@ -4,7 +4,7 @@ namespace jr.common
     {
         // public SummarizedItem(double _devRate, double _mgmtRate): 
         //     this(_devRate, _mgmtRate, false, string.Empty) {}
-        
+
         public SummarizedItem(bool _splitPO = false, string _projectTextToTrim = "")
         {
             this.split_po = _splitPO;

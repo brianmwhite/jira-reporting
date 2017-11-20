@@ -73,7 +73,8 @@ namespace jr.common
 
             return _summarizedWorkItems;
         }
-        public List<string[]> GenerateOutputData(List<SummarizedItem> _summarizedWorkItems, string columnMapString = "") {
+        public List<string[]> GenerateOutputData(List<SummarizedItem> _summarizedWorkItems, string columnMapString = "")
+        {
             if (string.IsNullOrEmpty(columnMapString))
             {
                 columnMapString = "Project,Code,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount";
@@ -138,16 +139,17 @@ namespace jr.common
                     dataRowNumber++;
                 }
                 dataTable.Add(values);
-            }            
+            }
             return dataTable;
         }
-        
+
         public static string GenerateSeparatedValueTextOutput(List<string[]> dataTable, char fieldSeparator)
         {
             StringBuilder output = new StringBuilder();
-            for (int rowNum = 0;rowNum<dataTable.Count;rowNum++) {
+            for (int rowNum = 0; rowNum < dataTable.Count; rowNum++)
+            {
                 string newList = string
-                    .Join(fieldSeparator,dataTable[rowNum]
+                    .Join(fieldSeparator, dataTable[rowNum]
                     .Select(x => string.Format("\"{0}\"", x))
                     .ToList());
                 output.AppendLine(newList);
