@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -10,6 +11,8 @@ namespace jr.common.tests
         private TimeSummarization _timeSummarizationData;
         public TimeSummarizationTests()
         {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+
             string[] mgmt = { "bwall" };
             _timeSummarizationData = new TimeSummarization(
                 _devRate: 0
