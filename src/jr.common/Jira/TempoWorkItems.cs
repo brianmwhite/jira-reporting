@@ -31,98 +31,17 @@ namespace jr.common.Jira
         [JsonProperty("jiraWorklogId")]
         public long? JiraWorklogId { get; set; }
 
-        [JsonProperty("meta")]
-        public object Meta { get; set; }
-
-        [JsonProperty("origin")]
-        public object Origin { get; set; }
-
-        [JsonProperty("self")]
-        public string Self { get; set; }
-
         [JsonProperty("tempoWorklogId")]
         public long TempoWorklogId { get; set; }
 
         [JsonProperty("timeSpentSeconds")]
         public long TimeSpentSeconds { get; set; }
-
-        [JsonProperty("workAttributeValues")]
-        public WorkAttributeValue[] WorkAttributeValues { get; set; }
-
-        [JsonProperty("worklogAttributes")]
-        public WorklogAttribute[] WorklogAttributes { get; set; }
-    }
-
-    public class WorklogAttribute
-    {
-        [JsonProperty("key")]
-        public string Key { get; set; }
-
-        [JsonProperty("value")]
-        public string Value { get; set; }
-    }
-
-    public class WorkAttributeValue
-    {
-        [JsonProperty("id")]
-        public long Id { get; set; }
-
-        [JsonProperty("value")]
-        public string Value { get; set; }
-
-        [JsonProperty("workAttribute")]
-        public WorkAttribute WorkAttribute { get; set; }
-
-        [JsonProperty("worklogId")]
-        public long WorklogId { get; set; }
-    }
-
-    public class WorkAttribute
-    {
-        [JsonProperty("externalUrl")]
-        public string ExternalUrl { get; set; }
-
-        [JsonProperty("id")]
-        public long Id { get; set; }
-
-        [JsonProperty("key")]
-        public string Key { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("required")]
-        public bool Required { get; set; }
-
-        [JsonProperty("sequence")]
-        public long Sequence { get; set; }
-
-        [JsonProperty("staticListValues")]
-        public object StaticListValues { get; set; }
-
-        [JsonProperty("type")]
-        public PurpleType Type { get; set; }
-    }
-
-    public class PurpleType
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("systemType")]
-        public bool SystemType { get; set; }
-
-        [JsonProperty("value")]
-        public string Value { get; set; }
     }
 
     public class Issue
     {
         [JsonProperty("id")]
         public long Id { get; set; }
-
-        [JsonProperty("internalIssue")]
-        public bool InternalIssue { get; set; }
 
         [JsonProperty("issueType")]
         public WorkItemIssueType IssueType { get; set; }
@@ -145,18 +64,12 @@ namespace jr.common.Jira
 
     public class WorkItemIssueType
     {
-        [JsonProperty("iconUrl")]
-        public string IconUrl { get; set; }
-
         [JsonProperty("name")]
         public string Name { get; set; }
     }
 
     public class Author
     {
-        [JsonProperty("avatar")]
-        public string Avatar { get; set; }
-
         [JsonProperty("displayName")]
         public string DisplayName { get; set; }
 
@@ -165,8 +78,5 @@ namespace jr.common.Jira
 
         [JsonProperty("name")]
         public string Name { get; set; }
-
-        [JsonProperty("self")]
-        public string Self { get; set; }
     }
 }
