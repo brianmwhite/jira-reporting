@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using jr.common.TempoProjectObjects;
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 
-namespace jr.common
+namespace jr.common.Jira
 {
     public class TempoInput
     {
@@ -46,15 +46,28 @@ namespace jr.common
 
         public string GetTempoProjectNameFromJson(string json)
         {
-            TempoProject tp = TempoProject.FromJson(json);
+            var tp = JsonConvert.DeserializeObject<TempoProject>(json,
+                new JsonSerializerSettings
+                {
+                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                    DateParseHandling = DateParseHandling.None
+                }
+            );
             return tp.Name;
         }
 
         public List<TempoWorkItems> ConvertJsonToTempoWorkItemList(string json)
         {
-            List<TempoWorkItems> twi = new List<TempoWorkItems>();
+            var twi = new List<TempoWorkItems>();
 
-            TempoWorkItems[] arr = TempoWorkItems.FromJson(json);
+            var arr = JsonConvert.DeserializeObject<TempoWorkItems[]>(json,
+                new JsonSerializerSettings
+                {
+                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                    DateParseHandling = DateParseHandling.None
+                }
+            );
+            
             twi.AddRange(arr);
 
             return twi;

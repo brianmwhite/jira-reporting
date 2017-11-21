@@ -6,6 +6,7 @@ using System.Text;
 using ExcelDataReader;
 using McMaster.Extensions.CommandLineUtils;
 using jr.common;
+using jr.common.Excel;
 
 //quicktype -o Options.cs --namespace "jr" sample.json
 

@@ -4,15 +4,12 @@
 //
 //    var data = TempoProject.FromJson(jsonString);
 //
-namespace jr.common.TempoProjectObjects
+
+using Newtonsoft.Json;
+
+namespace jr.common.Jira
 {
-    using System;
-    using System.Net;
-    using System.Collections.Generic;
-
-    using Newtonsoft.Json;
-
-    public partial class TempoProject
+    public class TempoProject
     {
         [JsonProperty("assigneeType")]
         public string AssigneeType { get; set; }
@@ -33,7 +30,7 @@ namespace jr.common.TempoProjectObjects
         public string Id { get; set; }
 
         [JsonProperty("issueTypes")]
-        public IssueType[] IssueTypes { get; set; }
+        public ProjectIssueType[] ProjectIssueTypes { get; set; }
 
         [JsonProperty("key")]
         public string Key { get; set; }
@@ -60,7 +57,7 @@ namespace jr.common.TempoProjectObjects
         public Version[] Versions { get; set; }
     }
 
-    public partial class Version
+    public class Version
     {
         [JsonProperty("archived")]
         public bool Archived { get; set; }
@@ -90,7 +87,7 @@ namespace jr.common.TempoProjectObjects
         public string UserReleaseDate { get; set; }
     }
 
-    public partial class Roles
+    public class Roles
     {
         [JsonProperty("Administrators")]
         public string Administrators { get; set; }
@@ -114,7 +111,7 @@ namespace jr.common.TempoProjectObjects
         public string TempoProjectManagers { get; set; }
     }
 
-    public partial class ProjectCategory
+    public class ProjectCategory
     {
         [JsonProperty("description")]
         public string Description { get; set; }
@@ -129,7 +126,7 @@ namespace jr.common.TempoProjectObjects
         public string Self { get; set; }
     }
 
-    public partial class Lead
+    public class Lead
     {
         [JsonProperty("accountId")]
         public string AccountId { get; set; }
@@ -153,7 +150,7 @@ namespace jr.common.TempoProjectObjects
         public string Self { get; set; }
     }
 
-    public partial class IssueType
+    public class ProjectIssueType
     {
         [JsonProperty("avatarId")]
         public long AvatarId { get; set; }
@@ -177,7 +174,7 @@ namespace jr.common.TempoProjectObjects
         public bool Subtask { get; set; }
     }
 
-    public partial class Component
+    public class Component
     {
         [JsonProperty("description")]
         public string Description { get; set; }
@@ -195,7 +192,7 @@ namespace jr.common.TempoProjectObjects
         public string Self { get; set; }
     }
 
-    public partial class AvatarUrls
+    public class AvatarUrls
     {
         [JsonProperty("16x16")]
         public string The16x16 { get; set; }
@@ -208,24 +205,5 @@ namespace jr.common.TempoProjectObjects
 
         [JsonProperty("48x48")]
         public string The48x48 { get; set; }
-    }
-
-    public partial class TempoProject
-    {
-        public static TempoProject FromJson(string json) => JsonConvert.DeserializeObject<TempoProject>(json, Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this TempoProject self) => JsonConvert.SerializeObject(self, Converter.Settings);
-    }
-
-    public class Converter
-    {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-        };
     }
 }

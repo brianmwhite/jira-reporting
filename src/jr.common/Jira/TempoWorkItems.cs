@@ -1,12 +1,8 @@
-namespace jr.common
+using Newtonsoft.Json;
+
+namespace jr.common.Jira
 {
-    using System;
-    using System.Net;
-    using System.Collections.Generic;
-
-    using Newtonsoft.Json;
-
-    public partial class TempoWorkItems
+    public class TempoWorkItems
     {
         [JsonProperty("author")]
         public Author Author { get; set; }
@@ -57,7 +53,7 @@ namespace jr.common
         public WorklogAttribute[] WorklogAttributes { get; set; }
     }
 
-    public partial class WorklogAttribute
+    public class WorklogAttribute
     {
         [JsonProperty("key")]
         public string Key { get; set; }
@@ -66,7 +62,7 @@ namespace jr.common
         public string Value { get; set; }
     }
 
-    public partial class WorkAttributeValue
+    public class WorkAttributeValue
     {
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -81,7 +77,7 @@ namespace jr.common
         public long WorklogId { get; set; }
     }
 
-    public partial class WorkAttribute
+    public class WorkAttribute
     {
         [JsonProperty("externalUrl")]
         public string ExternalUrl { get; set; }
@@ -108,7 +104,7 @@ namespace jr.common
         public PurpleType Type { get; set; }
     }
 
-    public partial class PurpleType
+    public class PurpleType
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -120,7 +116,7 @@ namespace jr.common
         public string Value { get; set; }
     }
 
-    public partial class Issue
+    public class Issue
     {
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -129,7 +125,7 @@ namespace jr.common
         public bool InternalIssue { get; set; }
 
         [JsonProperty("issueType")]
-        public IssueType IssueType { get; set; }
+        public WorkItemIssueType IssueType { get; set; }
 
         [JsonProperty("key")]
         public string Key { get; set; }
@@ -147,7 +143,7 @@ namespace jr.common
         public string Summary { get; set; }
     }
 
-    public partial class IssueType
+    public class WorkItemIssueType
     {
         [JsonProperty("iconUrl")]
         public string IconUrl { get; set; }
@@ -156,7 +152,7 @@ namespace jr.common
         public string Name { get; set; }
     }
 
-    public partial class Author
+    public class Author
     {
         [JsonProperty("avatar")]
         public string Avatar { get; set; }
@@ -172,24 +168,5 @@ namespace jr.common
 
         [JsonProperty("self")]
         public string Self { get; set; }
-    }
-
-    public partial class TempoWorkItems
-    {
-        public static TempoWorkItems[] FromJson(string json) => JsonConvert.DeserializeObject<TempoWorkItems[]>(json, Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this TempoWorkItems[] self) => JsonConvert.SerializeObject(self, Converter.Settings);
-    }
-
-    public class Converter
-    {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-        };
     }
 }
