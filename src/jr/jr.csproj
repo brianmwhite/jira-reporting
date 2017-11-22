@@ -1,17 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="FluentDateTime" Version="1.14.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\jr.common\jr.common.csproj" />
   </ItemGroup>
-
 </Project>

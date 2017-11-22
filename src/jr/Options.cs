@@ -1,9 +1,5 @@
 namespace jr
 {
-    using System;
-    using System.Net;
-    using System.Collections.Generic;
-
     using Newtonsoft.Json;
 
     public partial class Options
@@ -17,21 +13,10 @@ namespace jr
         [JsonProperty("filtering")]
         public Filtering Filtering { get; set; }
 
-        [JsonProperty("jira-setup")]
-        public JiraSetup JiraSetup { get; set; }
-
         [JsonProperty("output")]
         public Output Output { get; set; }
-
-        [JsonProperty("tempo-setup")]
-        public TempoSetup TempoSetup { get; set; }
     }
 
-    public partial class TempoSetup
-    {
-        [JsonProperty("apikey")]
-        public string Apikey { get; set; }
-    }
 
     public partial class Output
     {
@@ -43,18 +28,6 @@ namespace jr
 
         [JsonProperty("sort")]
         public string Sort { get; set; }
-    }
-
-    public partial class JiraSetup
-    {
-        [JsonProperty("jira_password")]
-        public string JiraPassword { get; set; }
-
-        [JsonProperty("jira_url")]
-        public string JiraUrl { get; set; }
-
-        [JsonProperty("jira_user")]
-        public string JiraUser { get; set; }
     }
 
     public partial class Filtering
