@@ -18,7 +18,7 @@ namespace jr
     }
 
 
-    public partial class Output
+    public class Output
     {
         [JsonProperty("col")]
         public string Col { get; set; }
@@ -30,7 +30,7 @@ namespace jr
         public string Sort { get; set; }
     }
 
-    public partial class Filtering
+    public class Filtering
     {
         [JsonProperty("account")]
         public string Account { get; set; }
@@ -47,11 +47,11 @@ namespace jr
         [JsonProperty("hide-non-billable")]
         public bool HideNonBillable { get; set; }
 
-        [JsonProperty("month")]
-        public double Month { get; set; }
+        [JsonProperty("time_period")]
+        public string TimePeriod { get; set; }
     }
 
-    public partial class BillingSetup
+    public class BillingSetup
     {
         [JsonProperty("dev_rate")]
         public double DevRate { get; set; }
@@ -63,7 +63,7 @@ namespace jr
         public string[] MgmtUsernames { get; set; }
     }
 
-    public partial class Advanced
+    public class Advanced
     {
         [JsonProperty("split-po")]
         public bool SplitPo { get; set; }
