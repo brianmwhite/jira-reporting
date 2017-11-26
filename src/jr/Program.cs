@@ -20,15 +20,23 @@ namespace jr
 {
     public static class Program
     {
+        //TODO: add consistent handling of errors, colorize output
+        //TODO: split out non console specific functionality to jr.common
+        
         public static int Main(string[] args)
         {
-            var app = new CommandLineApplication(false);
-            app.Name = "jr";
+            var app = new CommandLineApplication(false) {Name = "jr"};
+
+            //TODO: show help if no commands are specified
+            
             app.HelpOption();
 
             app.OnExecute(() => 0);
 
             app.Command("login", login, false);
+            
+            //TODO: try refactoring timesummary and login to named method
+            
             app.Command("timesummary", (command) =>
                 {
                     var userOptions = new Options();
@@ -65,9 +73,14 @@ namespace jr
                             switch (src)
                             {
                                 case "web":
+                                    
+                                    //TODO: check for local credentials first
+                                    
                                     var jc = LocalProfileInfo.LoadJiraCredentials();
                                     var ti = new TempoInput(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
 
+                                    //TODO: parse/catch invalid date strings
+                                    
                                     if (optionDateRange.HasValue())
                                     {
                                         userOptions.Filtering.DateStart = optionDateRange.Values[0];
@@ -142,8 +155,7 @@ namespace jr
                                         if (!string.IsNullOrEmpty(inputSourceLocation) &&
                                             !File.Exists(inputSourceLocation))
                                         {
-                                            Console.WriteLine(Path.GetFullPath(inputSourceLocation));
-                                            throw new FileNotFoundException();
+                                            Console.Error.WriteLine(string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
                                         }
 
                                         string output = GenerateSummaryFromFile(userOptions, inputSourceLocation);
@@ -161,7 +173,7 @@ namespace jr
 
         private static Options GetUserOptions(CommandOption optionConfigFileLocation)
         {
-            Options userOptions;
+            Options userOptions = new Options();
             //get json config location from command line argument
             string configFileLocation = optionConfigFileLocation.HasValue()
                 ? optionConfigFileLocation.Value()
@@ -170,22 +182,26 @@ namespace jr
             //check to see if the file exists
             if (string.IsNullOrEmpty(configFileLocation))
             {
-                throw new ArgumentNullException("ERROR: A config file is required");
-            }
-            if (!File.Exists(configFileLocation))
+                Console.Error.WriteLine("Config file (-c or --config) is required");
+            } 
+            else if (!File.Exists(configFileLocation))
             {
-                Console.WriteLine(Path.GetFullPath(configFileLocation));
-                throw new FileNotFoundException();
+                Console.Error.WriteLine(
+                    string.Format($"Config file not found: {Path.GetFullPath(configFileLocation)}"));
             }
-
-            //deserialize json
-            string configJson = File.ReadAllText(configFileLocation);
-            userOptions = Options.FromJson(configJson);
+            else
+            {
+                //deserialize json
+                string configJson = File.ReadAllText(configFileLocation);
+                userOptions = Options.FromJson(configJson);
+            }
             return userOptions;
         }
 
         private static void login(CommandLineApplication command)
         {
+            //TODO: test login before saving
+            
             command.Description = "Provide login credentials to jira";
             command.HelpOption();
             command.OnExecute(() =>
