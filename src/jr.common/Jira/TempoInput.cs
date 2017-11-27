@@ -80,6 +80,11 @@ namespace jr.common.Jira
             return projectName;
         }
 
+        public static double ConvertSecondsToHours(long seconds)
+        {
+            return seconds > 0 ? seconds / 60.0 / 60.0 : 0;
+        }
+        
         public List<WorkItem> ConvertTempoWorkItemListToWorkItems(List<TempoWorkItems> twi)
         {
             List<WorkItem> wi = new List<WorkItem>();
@@ -89,7 +94,7 @@ namespace jr.common.Jira
                 WorkItem w = new WorkItem();
                 w.issueKey = item.Issue.Key;
                 w.issueName = item.Issue.Summary;
-                w.billedHours = item.BilledSeconds > 0 ? item.BilledSeconds / 60.0 / 60.0 : 0;
+                w.billedHours = ConvertSecondsToHours(item.BilledSeconds);
                 w.userName = item.Author.Name;
                 if (projectLookup.ContainsKey(item.Issue.ProjectId))
                 {

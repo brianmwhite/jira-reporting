@@ -23,8 +23,6 @@ namespace jr.common.tests
             return si;
         }
         
-        //TODO: add test with TempoWorkItem to WorkItem - cover the 60 vs 60.0 issue
-
         public static List<SummarizedItem> CreateSummarizedItemListWithTotals()
         {
             List<SummarizedItem> si = new List<SummarizedItem>();

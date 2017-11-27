@@ -1,14 +1,23 @@
 //TODO: add isolated tests, create test data
 
-//using System;
-//using System.Collections.Generic;
-//using jr.common.Jira;
-//using Xunit;
+using System;
+using System.Collections.Generic;
+using jr.common.Jira;
+using Xunit;
 //
-//namespace jr.common.tests
-//{
-//    public class TempoTests : IDisposable
-//    {
+namespace jr.common.tests
+{
+    public class TempoTests
+    {
+        [Fact]
+        public void ConvertSecondsToHoursTest()
+        {
+            const double expectedHours = 5.25;
+            double actualHours = TempoInput.ConvertSecondsToHours(18900);
+            
+            Assert.Equal(expectedHours, actualHours);
+        }
+        
 //        private readonly string _dateTo;
 //        private readonly string _dateFrom;
 //        private readonly string _accountKey;
@@ -60,10 +69,5 @@
 //            var si = timeSummarizationData.SummarizeWorkItems(wi);
 //            Assert.NotEqual(string.Empty, outputJson);
 //        }
-//
-//        public void Dispose()
-//        {
-//            _tempoInput = null;
-//        }
-//    }
-//}
+    }
+}
