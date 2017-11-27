@@ -89,7 +89,7 @@ namespace jr.common.Jira
                 WorkItem w = new WorkItem();
                 w.issueKey = item.Issue.Key;
                 w.issueName = item.Issue.Summary;
-                w.billedHours = item.BilledSeconds > 0 ? item.BilledSeconds / 60 / 60 : 0;
+                w.billedHours = item.BilledSeconds > 0 ? item.BilledSeconds / 60.0 / 60.0 : 0;
                 w.userName = item.Author.Name;
                 if (projectLookup.ContainsKey(item.Issue.ProjectId))
                 {

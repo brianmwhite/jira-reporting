@@ -22,6 +22,8 @@ namespace jr.common.tests
             AddSummarizedItemDataRows(si);
             return si;
         }
+        
+        //TODO: add test with TempoWorkItem to WorkItem - cover the 60 vs 60.0 issue
 
         public static List<SummarizedItem> CreateSummarizedItemListWithTotals()
         {
