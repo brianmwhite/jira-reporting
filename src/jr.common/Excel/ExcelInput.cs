@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using ExcelDataReader;
 
-namespace jr.common
+namespace jr.common.Excel
 {
     public class ExcelInput
     {

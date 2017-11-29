@@ -1,9 +1,5 @@
 namespace jr
 {
-    using System;
-    using System.Net;
-    using System.Collections.Generic;
-
     using Newtonsoft.Json;
 
     public partial class Options
@@ -17,23 +13,12 @@ namespace jr
         [JsonProperty("filtering")]
         public Filtering Filtering { get; set; }
 
-        [JsonProperty("jira-setup")]
-        public JiraSetup JiraSetup { get; set; }
-
         [JsonProperty("output")]
         public Output Output { get; set; }
-
-        [JsonProperty("tempo-setup")]
-        public TempoSetup TempoSetup { get; set; }
     }
 
-    public partial class TempoSetup
-    {
-        [JsonProperty("apikey")]
-        public string Apikey { get; set; }
-    }
 
-    public partial class Output
+    public class Output
     {
         [JsonProperty("col")]
         public string Col { get; set; }
@@ -45,19 +30,7 @@ namespace jr
         public string Sort { get; set; }
     }
 
-    public partial class JiraSetup
-    {
-        [JsonProperty("jira_password")]
-        public string JiraPassword { get; set; }
-
-        [JsonProperty("jira_url")]
-        public string JiraUrl { get; set; }
-
-        [JsonProperty("jira_user")]
-        public string JiraUser { get; set; }
-    }
-
-    public partial class Filtering
+    public class Filtering
     {
         [JsonProperty("account")]
         public string Account { get; set; }
@@ -74,11 +47,11 @@ namespace jr
         [JsonProperty("hide-non-billable")]
         public bool HideNonBillable { get; set; }
 
-        [JsonProperty("month")]
-        public double Month { get; set; }
+        [JsonProperty("time_period")]
+        public string TimePeriod { get; set; }
     }
 
-    public partial class BillingSetup
+    public class BillingSetup
     {
         [JsonProperty("dev_rate")]
         public double DevRate { get; set; }
@@ -90,7 +63,7 @@ namespace jr
         public string[] MgmtUsernames { get; set; }
     }
 
-    public partial class Advanced
+    public class Advanced
     {
         [JsonProperty("split-po")]
         public bool SplitPo { get; set; }

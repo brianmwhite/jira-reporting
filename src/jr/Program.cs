@@ -1,78 +1,230 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using ExcelDataReader;
+using FluentDateTime;
 using McMaster.Extensions.CommandLineUtils;
 using jr.common;
+using jr.common.Excel;
+using jr.common.Jira;
+using Newtonsoft.Json;
 
 //quicktype -o Options.cs --namespace "jr" sample.json
 
 namespace jr
 {
-    class Program
+    public static class Program
     {
+        //TODO: add consistent handling of errors, colorize output
+        //TODO: split out non console specific functionality to jr.common
+        
         public static int Main(string[] args)
         {
-            Options userOptions = new Options();
+            var app = new CommandLineApplication(false) {Name = "jr"};
 
-            var app = new CommandLineApplication();
-
+            //TODO: show help if no commands are specified
+            
             app.HelpOption();
-            var optionConfigFileLocation = app.Option("-c|--config <CONFIG_FILE>", "Configuration file location", CommandOptionType.SingleValue);
-            var optionInputSource = app.Option("-i|--input <INPUT_FILE>", "Input file location", CommandOptionType.SingleValue);
 
-            app.OnExecute(() =>
-            {
-                try
+            app.OnExecute(() => 0);
+
+            app.Command("login", login, false);
+            
+            //TODO: try refactoring timesummary and login to named method
+            
+            app.Command("timesummary", (command) =>
                 {
-                    //get json config location from command line argument
-                    string configFileLocation = optionConfigFileLocation.HasValue()
-                        ? optionConfigFileLocation.Value()
-                        : string.Empty;
+                    var userOptions = new Options();
 
-                    //check to see if the file exists
-                    if (string.IsNullOrEmpty(configFileLocation))
+                    var optionSrcOption = command.Option("-s|--src <SRC>"
+                        , "Source option: web [default], excel",
+                        CommandOptionType.SingleValue);
+                    
+                    var optionConfigFileLocation = command.Option("-c|--config <CONFIG_FILE>",
+                        "Configuration file location"
+                        , CommandOptionType.SingleValue);
+                    
+                    var optionInputSource = command.Option("-i|--input <INPUT_FILE>"
+                        , "Input file location",
+                        CommandOptionType.SingleValue);
+                    
+                    var optionTimePeriod = command.Option("-t|--timeperiod <TIME_PERIOD>",
+                        "Time period: lastmonth, month, ytd"
+                        , CommandOptionType.SingleValue);
+                    
+                    var optionAccount = command.Option("-a|--account <ACCOUNT>", "Account key",
+                        CommandOptionType.SingleValue);
+                    
+                    var optionDateRange = command.Option("-d|--daterange <dates>", "Date Range",
+                        CommandOptionType.MultipleValue);
+
+                    command.OnExecute(() =>
                     {
-                        throw new ArgumentNullException("ERROR: A config file is required");
-                    }
-                    else if (!File.Exists(configFileLocation))
-                    {
-                        Console.WriteLine(Path.GetFullPath(configFileLocation));
-                        throw new FileNotFoundException();
-                    }
+                        userOptions = GetUserOptions(optionConfigFileLocation);
 
-                    //deserialize json
-                    string configJson = File.ReadAllText(configFileLocation);
-                    userOptions = Options.FromJson(configJson);
+                        if (optionSrcOption.HasValue())
+                        {
+                            string src = optionSrcOption.Value();
+                            switch (src)
+                            {
+                                case "web":
+                                    
+                                    //TODO: check for local credentials first
+                                    
+                                    var jc = LocalProfileInfo.LoadJiraCredentials();
+                                    var ti = new TempoInput(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
 
-                    //get source file location from command line argument
-                    string inputSourceLocation = optionInputSource.HasValue()
-                        ? optionInputSource.Value()
-                        : string.Empty;
+                                    //TODO: parse/catch invalid date strings
+                                    
+                                    if (optionDateRange.HasValue())
+                                    {
+                                        userOptions.Filtering.DateStart = optionDateRange.Values[0];
+                                        userOptions.Filtering.DateEnd = optionDateRange.Values[1];
+                                    }
+                                    else if (optionTimePeriod.HasValue())
+                                    {
+                                        switch (optionTimePeriod.Value())
+                                        {
+                                            case "ytd":
+                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfYear()
+                                                    .ToString("yyyy-MM-dd");
+                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
+                                                break;
+                                            case "month":
+                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfMonth()
+                                                    .ToString("yyyy-MM-dd");
+                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
+                                                break;
+                                            case "lastmonth":
+                                                userOptions.Filtering.DateStart = DateTime.Now.PreviousMonth()
+                                                    .FirstDayOfMonth().ToString("yyyy-MM-dd");
+                                                userOptions.Filtering.DateEnd = DateTime.Now.PreviousMonth()
+                                                    .LastDayOfMonth().ToString("yyyy-MM-dd");
+                                                break;
+                                            case "week":
+                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfWeek()
+                                                    .FirstDayOfMonth().ToString("yyyy-MM-dd");
+                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
+                                                break;
+                                            case "lastweek":
+                                                userOptions.Filtering.DateStart = DateTime.Now.WeekEarlier()
+                                                    .FirstDayOfWeek().ToString("yyyy-MM-dd");
+                                                userOptions.Filtering.DateEnd = DateTime.Now.WeekEarlier()
+                                                    .LastDayOfWeek().ToString("yyyy-MM-dd");
+                                                break;
+                                            default:
+                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfMonth()
+                                                    .ToString("yyyy-MM-dd");
+                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
+                                                break;
+                                        }
+                                    }
+                                    if (optionAccount.HasValue())
+                                    {
+                                        userOptions.Filtering.Account = optionAccount.Value();
+                                    }
+                                    string json = ti.GetWorkItemsJsonFromTempo(userOptions.Filtering.DateStart,
+                                        userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
+                                    List<TempoWorkItems> twi = ti.ConvertJsonToTempoWorkItemList(json);
+                                    List<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi);
 
-                    //check to see if the input file exists
-                    if (!string.IsNullOrEmpty(inputSourceLocation) && !File.Exists(inputSourceLocation))
-                    {
-                        Console.WriteLine(Path.GetFullPath(inputSourceLocation));
-                        throw new FileNotFoundException();
-                    }
+                                    TimeSummarization ts = new TimeSummarization(
+                                        userOptions.BillingSetup.DevRate
+                                        , userOptions.BillingSetup.MgmtRate
+                                        , userOptions.BillingSetup.MgmtUsernames
+                                        , userOptions.Advanced.SplitPo
+                                        , userOptions.Advanced.Trim
+                                        , userOptions.Output.Col
+                                    );
 
-                    string output = GenerateSummaryFromFile(userOptions, inputSourceLocation);
-                    Console.WriteLine(output);
+                                    string tempo_output = ts.GenerateSummaryText(wi);
+                                    Console.WriteLine(tempo_output);
 
-                    return 0;
+                                    break;
+                                case "excel":
+                                    //excel
+                                    if (optionInputSource.HasValue())
+                                    {
+                                        string inputSourceLocation = optionInputSource.Value();
+                                        //check to see if the input file exists
+                                        if (!string.IsNullOrEmpty(inputSourceLocation) &&
+                                            !File.Exists(inputSourceLocation))
+                                        {
+                                            Console.Error.WriteLine(string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
+                                        }
+
+                                        string output = GenerateSummaryFromFile(userOptions, inputSourceLocation);
+                                        Console.WriteLine(output);
+                                    }
+                                    break;
+                            }
+                        }
+                    });
                 }
-                catch (Exception ex) when
-                    (ex is ArgumentNullException || ex is FileNotFoundException)
-                {
-                    Console.WriteLine(ex.Message);
-                    return 1;
-                }
-            });
+                , false);
 
             return app.Execute(args);
+        }
+
+        private static Options GetUserOptions(CommandOption optionConfigFileLocation)
+        {
+            Options userOptions = new Options();
+            //get json config location from command line argument
+            string configFileLocation = optionConfigFileLocation.HasValue()
+                ? optionConfigFileLocation.Value()
+                : string.Empty;
+
+            //check to see if the file exists
+            if (string.IsNullOrEmpty(configFileLocation))
+            {
+                Console.Error.WriteLine("Config file (-c or --config) is required");
+            } 
+            else if (!File.Exists(configFileLocation))
+            {
+                Console.Error.WriteLine(
+                    string.Format($"Config file not found: {Path.GetFullPath(configFileLocation)}"));
+            }
+            else
+            {
+                //deserialize json
+                string configJson = File.ReadAllText(configFileLocation);
+                userOptions = Options.FromJson(configJson);
+            }
+            return userOptions;
+        }
+
+        private static void login(CommandLineApplication command)
+        {
+            //TODO: test login before saving
+            
+            command.Description = "Provide login credentials to jira";
+            command.HelpOption();
+            command.OnExecute(() =>
+            {
+                Console.WriteLine("-- Enter Jira login info ---");
+                Console.Write("jira url (https://companyname.atlassian.net): ");
+                var url = Console.ReadLine();
+
+                Console.Write("login: ");
+                var login = Console.ReadLine();
+
+                Console.Write("password: ");
+                var password = Console.ReadLine();
+
+                var jc = new JiraCredentials
+                {
+                    JiraURL = url,
+                    JiraUser = login,
+                    JiraPassword = password
+                };
+                var json = JsonConvert.SerializeObject(jc);
+                LocalProfileInfo.CreateJiraCredentialsFile(json);
+            });
         }
 
         private static string GenerateSummaryFromFile(Options userOptions, string inputSourceLocation)
@@ -80,7 +232,7 @@ namespace jr
             List<WorkItem> workItems = ExtractWorkItemsFromExcel(inputSourceLocation);
 
             TimeSummarization ts = new TimeSummarization(
-                  userOptions.BillingSetup.DevRate
+                userOptions.BillingSetup.DevRate
                 , userOptions.BillingSetup.MgmtRate
                 , userOptions.BillingSetup.MgmtUsernames
                 , userOptions.Advanced.SplitPo

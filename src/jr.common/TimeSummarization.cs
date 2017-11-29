@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -82,7 +83,8 @@ namespace jr.common
         {
             OrderedDictionary columnMap = new OrderedDictionary();
             string[] columnFields = outputColumns.Split(',');
-
+            CultureInfo culture = new CultureInfo("en-US");
+            
             List<string[]> dataTable = new List<string[]>();
 
             foreach (string col in columnFields)
@@ -110,28 +112,28 @@ namespace jr.common
                     switch (item.Key)
                     {
                         case ("Project"):
-                            values[dataRowNumber] = string.Format("{0}", row.billing_project);
+                            values[dataRowNumber] = string.Format(culture, "{0}", row.billing_project);
                             break;
                         case ("Code"):
-                            values[dataRowNumber] = string.Format("{0}", row.billing_code);
+                            values[dataRowNumber] = string.Format(culture, "{0}", row.billing_code);
                             break;
                         case ("Dev_Hours"):
-                            values[dataRowNumber] = string.Format("{0:N2}", row.dev_hours);
+                            values[dataRowNumber] = string.Format(culture, "{0:N2}", row.dev_hours);
                             break;
                         case ("Dev_Amount"):
-                            values[dataRowNumber] = string.Format("{0:C}", row.dev_amount);
+                            values[dataRowNumber] = string.Format(culture, "{0:C}", row.dev_amount);
                             break;
                         case ("Mgmt_Hours"):
-                            values[dataRowNumber] = string.Format("{0:N2}", row.mgmt_hours);
+                            values[dataRowNumber] = string.Format(culture, "{0:N2}", row.mgmt_hours);
                             break;
                         case ("Mgmt_Amount"):
-                            values[dataRowNumber] = string.Format("{0:C}", row.mgmt_amount);
+                            values[dataRowNumber] = string.Format(culture, "{0:C}", row.mgmt_amount);
                             break;
                         case ("Total_Hours"):
-                            values[dataRowNumber] = string.Format("{0:N2}", row.total_hours);
+                            values[dataRowNumber] = string.Format(culture, "{0:N2}", row.total_hours);
                             break;
                         case ("Total_Amount"):
-                            values[dataRowNumber] = string.Format("{0:C}", row.total_amount);
+                            values[dataRowNumber] = string.Format(culture, "{0:C}", row.total_amount);
                             break;
                         default:
                             break;

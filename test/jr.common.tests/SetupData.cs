@@ -22,7 +22,7 @@ namespace jr.common.tests
             AddSummarizedItemDataRows(si);
             return si;
         }
-
+        
         public static List<SummarizedItem> CreateSummarizedItemListWithTotals()
         {
             List<SummarizedItem> si = new List<SummarizedItem>();
