@@ -14,7 +14,22 @@ namespace jr.common.tests
         {
             const double expectedHours = 5.25;
             double actualHours = TempoInput.ConvertSecondsToHours(18900);
-            
+            Assert.Equal(expectedHours, actualHours);
+        }
+        
+        [Fact]
+        public void ConvertSecondsToHoursZeroTest()
+        {
+            const double expectedHours = 0;
+            double actualHours = TempoInput.ConvertSecondsToHours(0);
+            Assert.Equal(expectedHours, actualHours);
+        }
+        
+        [Fact]
+        public void ConvertSecondsToHoursNegativeTest()
+        {
+            const double expectedHours = 0;
+            double actualHours = TempoInput.ConvertSecondsToHours(-1000);
             Assert.Equal(expectedHours, actualHours);
         }
         
