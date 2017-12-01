@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using ExcelDataReader;
 using FluentDateTime;
 using McMaster.Extensions.CommandLineUtils;
 using jr.common;
@@ -33,13 +27,13 @@ namespace jr
 
             app.OnExecute(() => 0);
 
-            app.Command("login", login, false);
+            app.Command("login", Login, false);
             
             //TODO: try refactoring timesummary and login to named method
             
             app.Command("timesummary", (command) =>
                 {
-                    var userOptions = new Options();
+                    Options userOptions;
 
                     var optionSrcOption = command.Option("-s|--src <SRC>"
                         , "Source option: web [default], excel",
@@ -62,6 +56,9 @@ namespace jr
                     
                     var optionDateRange = command.Option("-d|--daterange <dates>", "Date Range",
                         CommandOptionType.MultipleValue);
+
+                    var optionGroupBy = command.Option("-g|--groupby <groupby>", "Group by <project>, <issue>",
+                        CommandOptionType.SingleValue);
 
                     command.OnExecute(() =>
                     {
@@ -128,22 +125,38 @@ namespace jr
                                     {
                                         userOptions.Filtering.Account = optionAccount.Value();
                                     }
+                                    
+                                    if (optionGroupBy.HasValue())
+                                    {
+                                        string groupString = optionGroupBy.Value().ToLower();
+                                        if (groupString == "project" || groupString == "issue")
+                                        {
+                                            userOptions.Filtering.Groupby = groupString;
+                                        }
+                                        else
+                                        {
+                                            userOptions.Filtering.Groupby = "project";
+                                        }
+                                    }
+                                    
                                     string json = ti.GetWorkItemsJsonFromTempo(userOptions.Filtering.DateStart,
                                         userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
+                                    
                                     List<TempoWorkItems> twi = ti.ConvertJsonToTempoWorkItemList(json);
                                     List<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi);
 
-                                    TimeSummarization ts = new TimeSummarization(
-                                        userOptions.BillingSetup.DevRate
-                                        , userOptions.BillingSetup.MgmtRate
-                                        , userOptions.BillingSetup.MgmtUsernames
-                                        , userOptions.Advanced.SplitPo
-                                        , userOptions.Advanced.Trim
-                                        , userOptions.Output.Col
+                                    var ts = new TimeSummarization(
+                                        devRate: userOptions.BillingSetup.DevRate
+                                        , mgmtRate: userOptions.BillingSetup.MgmtRate
+                                        , mgmtUsers: userOptions.BillingSetup.MgmtUsernames
+                                        , splitPo: userOptions.Advanced.SplitPo
+                                        , projectTextToTrim: userOptions.Advanced.Trim
+                                        , outputColumns: userOptions.Output.Col
+                                        , groupByString: userOptions.Filtering.Groupby
                                     );
 
-                                    string tempo_output = ts.GenerateSummaryText(wi);
-                                    Console.WriteLine(tempo_output);
+                                    string tempoOutput = ts.GenerateSummaryText(wi);
+                                    Console.WriteLine(tempoOutput);
 
                                     break;
                                 case "excel":
@@ -198,7 +211,7 @@ namespace jr
             return userOptions;
         }
 
-        private static void login(CommandLineApplication command)
+        private static void Login(CommandLineApplication command)
         {
             //TODO: test login before saving
             
@@ -229,15 +242,16 @@ namespace jr
 
         private static string GenerateSummaryFromFile(Options userOptions, string inputSourceLocation)
         {
-            List<WorkItem> workItems = ExtractWorkItemsFromExcel(inputSourceLocation);
+            var workItems = ExtractWorkItemsFromExcel(inputSourceLocation);
 
-            TimeSummarization ts = new TimeSummarization(
-                userOptions.BillingSetup.DevRate
-                , userOptions.BillingSetup.MgmtRate
-                , userOptions.BillingSetup.MgmtUsernames
-                , userOptions.Advanced.SplitPo
-                , userOptions.Advanced.Trim
-                , userOptions.Output.Col
+            var ts = new TimeSummarization(
+                devRate: userOptions.BillingSetup.DevRate
+                , mgmtRate: userOptions.BillingSetup.MgmtRate
+                , mgmtUsers: userOptions.BillingSetup.MgmtUsernames
+                , splitPo: userOptions.Advanced.SplitPo
+                , projectTextToTrim: userOptions.Advanced.Trim
+                , outputColumns: userOptions.Output.Col
+                , groupByString: userOptions.Filtering.Groupby
             );
 
             return ts.GenerateSummaryText(workItems);

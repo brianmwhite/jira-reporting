@@ -2,8 +2,25 @@ namespace jr
 {
     using Newtonsoft.Json;
 
-    public partial class Options
+    public class Options
     {
+        public Options()
+        {
+            Advanced = new Advanced();
+            BillingSetup = new BillingSetup();
+            Filtering = new Filtering();
+            Output = new Output();
+        }
+
+        public static Options FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<Options>(json, new JsonSerializerSettings
+            {
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                DateParseHandling = DateParseHandling.None,
+            });
+        }
+
         [JsonProperty("advanced")]
         public Advanced Advanced { get; set; }
 
@@ -70,24 +87,5 @@ namespace jr
 
         [JsonProperty("trim")]
         public string Trim { get; set; }
-    }
-
-    public partial class Options
-    {
-        public static Options FromJson(string json) => JsonConvert.DeserializeObject<Options>(json, Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this Options self) => JsonConvert.SerializeObject(self, Converter.Settings);
-    }
-
-    public class Converter
-    {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-        };
     }
 }

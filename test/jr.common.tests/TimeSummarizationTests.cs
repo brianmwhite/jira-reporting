@@ -13,12 +13,12 @@ namespace jr.common.tests
         {
             string[] mgmt = { "bwall" };
             _timeSummarizationData = new TimeSummarization(
-                _devRate: 0
-                , _mgmtRate: 0
-                , _mgmtUsers: mgmt
-                , _splitPO: false
-                , _projectTextToTrim: ""
-                , _outputColumns: "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                devRate: 0
+                , mgmtRate: 0
+                , mgmtUsers: mgmt
+                , splitPo: false
+                , projectTextToTrim: ""
+                , outputColumns: "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
             );
         }
 

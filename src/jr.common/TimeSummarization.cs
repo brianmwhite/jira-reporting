@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -10,79 +9,82 @@ namespace jr.common
 {
     public class TimeSummarization
     {
-        private double devRate;
-        private double mgmtRate;
-        private string[] mgmtUsers;
-        private bool splitPO;
-        private string projectTextToTrim;
+        private readonly double _devRate;
+        private readonly double _mgmtRate;
+        private readonly string[] _mgmtUsers;
+        private readonly bool _splitPo;
+        private readonly string _projectTextToTrim;
+        private readonly bool _groupByIssue;
+        private readonly string _outputColumns;
 
-        private string outputColumns;
-
-        public TimeSummarization(double _devRate, double _mgmtRate, string[] _mgmtUsers, bool _splitPO, string _projectTextToTrim, string _outputColumns = "")
+        public TimeSummarization(double devRate, double mgmtRate, string[] mgmtUsers ,bool splitPo
+                                ,string projectTextToTrim ,string outputColumns = "", string groupByString = "project")
         {
-            this.devRate = _devRate;
-            this.mgmtRate = _mgmtRate;
-            if (_mgmtUsers is null)
-            {
-                this.mgmtUsers = new string[] { };
-            }
-            else
-            {
-                this.mgmtUsers = _mgmtUsers;
-            }
-            this.splitPO = _splitPO;
-            this.projectTextToTrim = _projectTextToTrim;
-            this.outputColumns = string.IsNullOrEmpty(_outputColumns) ? "Project,Code,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount" : _outputColumns;
+            _devRate = devRate;
+            _mgmtRate = mgmtRate;
+            _mgmtUsers = mgmtUsers is null ? new string[] { } : mgmtUsers;
+
+            _splitPo = splitPo;
+            _projectTextToTrim = projectTextToTrim;
+
+            _groupByIssue = groupByString == "issue";
+            
+            _outputColumns = string.IsNullOrEmpty(outputColumns) 
+                ? "Project,Code,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount" 
+                : outputColumns;
         }
 
-        public string GenerateSummaryText(List<WorkItem> workItems)
+        public string GenerateSummaryText(IEnumerable<WorkItem> workItems)
         {
-            List<SummarizedItem> si = this.SummarizeWorkItems(workItems);
+            var si = SummarizeWorkItems(workItems);
             si.Add(AddSummarizedTotal(si));
-            List<string[]> dataTable = this.GenerateOutputData(si);
-            return TimeSummarization.GenerateSeparatedValueTextOutput(dataTable, '\t');
+            var dataTable = GenerateOutputData(si);
+            return GenerateSeparatedValueTextOutput(dataTable, '\t');
         }
 
-        public List<SummarizedItem> SummarizeWorkItems(List<WorkItem> _workItems)
+        public List<SummarizedItem> SummarizeWorkItems(IEnumerable<WorkItem> workItems)
         {
-            List<SummarizedItem> _summarizedWorkItems = new List<SummarizedItem>();
-            _summarizedWorkItems = _workItems
+            var summarizedWorkItems = workItems
                 .Where(x => x.billedHours > 0)
-                .GroupBy(x => x.project)
-                .Select(x => new SummarizedItem(splitPO, projectTextToTrim)
-                {
-                    project = x.First().project,
-                    dev_rate = devRate,
-                    mgmt_rate = mgmtRate,
-                    dev_hours = x.Sum(z => !mgmtUsers.Contains(z.userName) ? z.billedHours : 0),
-                    mgmt_hours = x.Sum(z => mgmtUsers.Contains(z.userName) ? z.billedHours : 0),
-                }
+                .GroupBy(x => _groupByIssue ? x.issueKey : x.project)
+                .Select(x => new SummarizedItem(_splitPo, _projectTextToTrim)
+                    {
+                        project = x.First().project,
+                        issue = x.First().combinedIssueName,
+                        dev_rate = _devRate,
+                        mgmt_rate = _mgmtRate,
+                        dev_hours = x.Sum(z => !_mgmtUsers.Contains(z.userName) ? z.billedHours : 0),
+                        mgmt_hours = x.Sum(z => _mgmtUsers.Contains(z.userName) ? z.billedHours : 0),
+                    }
                 )
                 .OrderBy(x => x.billing_code)
                 .ThenBy(x => x.project)
+                .ThenBy(x => x.issue)
                 .ToList();
 
-            return _summarizedWorkItems;
+            return summarizedWorkItems;
         }
 
-        private SummarizedItem AddSummarizedTotal(List<SummarizedItem> _summarizedWorkItems)
+        private SummarizedItem AddSummarizedTotal(IReadOnlyCollection<SummarizedItem> summarizedWorkItems)
         {
             SummarizedItem totalRow = new SummarizedItem()
             {
-                project = "Total",
-                dev_rate = devRate,
-                mgmt_rate = mgmtRate,
-                dev_hours = _summarizedWorkItems.Sum(x => x.dev_hours),
-                mgmt_hours = _summarizedWorkItems.Sum(x => x.mgmt_hours),
+                project = "",
+                //TODO: figure out how to get total in the first column regardless
+                issue = "",
+                dev_rate = _devRate,
+                mgmt_rate = _mgmtRate,
+                dev_hours = summarizedWorkItems.Sum(x => x.dev_hours),
+                mgmt_hours = summarizedWorkItems.Sum(x => x.mgmt_hours),
             };
 
             return totalRow;
         }
 
-        public List<string[]> GenerateOutputData(List<SummarizedItem> _summarizedWorkItems)
+        public List<string[]> GenerateOutputData(IEnumerable<SummarizedItem> summarizedWorkItems)
         {
             OrderedDictionary columnMap = new OrderedDictionary();
-            string[] columnFields = outputColumns.Split(',');
+            string[] columnFields = _outputColumns.Split(',');
             CultureInfo culture = new CultureInfo("en-US");
             
             List<string[]> dataTable = new List<string[]>();
@@ -103,7 +105,7 @@ namespace jr.common
             dataTable.Add(headers);
 
             //build data rows
-            foreach (var row in _summarizedWorkItems)
+            foreach (var row in summarizedWorkItems)
             {
                 int dataRowNumber = 0;
                 string[] values = new string[columnMap.Values.Count];
@@ -117,6 +119,9 @@ namespace jr.common
                         case ("Code"):
                             values[dataRowNumber] = string.Format(culture, "{0}", row.billing_code);
                             break;
+                        case ("Issue"):
+                            values[dataRowNumber] = string.Format(culture, "{0}", row.issue);
+                            break;    
                         case ("Dev_Hours"):
                             values[dataRowNumber] = string.Format(culture, "{0:N2}", row.dev_hours);
                             break;
@@ -135,8 +140,6 @@ namespace jr.common
                         case ("Total_Amount"):
                             values[dataRowNumber] = string.Format(culture, "{0:C}", row.total_amount);
                             break;
-                        default:
-                            break;
                     }
                     dataRowNumber++;
                 }
@@ -145,13 +148,13 @@ namespace jr.common
             return dataTable;
         }
 
-        public static string GenerateSeparatedValueTextOutput(List<string[]> dataTable, char fieldSeparator)
+        public static string GenerateSeparatedValueTextOutput(IEnumerable<string[]> dataTable, char fieldSeparator)
         {
-            StringBuilder output = new StringBuilder();
-            for (int rowNum = 0; rowNum < dataTable.Count; rowNum++)
+            var output = new StringBuilder();
+            foreach (var t in dataTable)
             {
-                string newList = string
-                    .Join(fieldSeparator, dataTable[rowNum]
+                var newList = string
+                    .Join(fieldSeparator, t
                     .Select(x => string.Format("\"{0}\"", x))
                     .ToList());
                 output.AppendLine(newList);

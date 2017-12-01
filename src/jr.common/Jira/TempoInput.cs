@@ -7,21 +7,20 @@ namespace jr.common.Jira
 {
     public class TempoInput
     {
-        private readonly string url;
-        private readonly string user;
-        private readonly string pwd;
+        private readonly string _url;
+        private readonly string _user;
+        private readonly string _pwd;
         public TempoInput(string url, string user, string pwd)
         {
-            this.pwd = pwd;
-            this.user = user;
-            this.url = url;
+            _pwd = pwd;
+            _user = user;
+            _url = url;
         }
 
         public string GetWorkItemsJsonFromTempo(string dateFrom, string dateTo, string accountKey)
         {
-            List<WorkItem> workItems = new List<WorkItem>();
-            RestClient client = new RestClient(url + "/rest/tempo-timesheets/3/");
-            client.Authenticator = new HttpBasicAuthenticator(user, pwd);
+            RestClient client = new RestClient(_url + "/rest/tempo-timesheets/3/");
+            client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
 
             RestRequest request = new RestRequest("worklogs", Method.GET);
             request.AddQueryParameter("dateFrom", dateFrom);
@@ -34,14 +33,53 @@ namespace jr.common.Jira
 
         public string GetProjectJsonFromJira(long projectId)
         {
-            RestClient client = new RestClient(url + "/rest/api/2/");
-            client.Authenticator = new HttpBasicAuthenticator(user, pwd);
+            RestClient client = new RestClient(_url + "/rest/api/2/");
+            client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
 
             RestRequest request = new RestRequest("project/{projectIdOrKey}", Method.GET);
             request.AddUrlSegment("projectIdOrKey", projectId);
 
             IRestResponse response = client.Execute(request);
             return response.Content;
+        }
+
+        public (string IssueKey, string IssueName) GetParentIssueString(long issueId)
+        {
+            string json = GetIssueJsonFromJira(issueId);
+            return GetParentIssueFromJson(json);
+        }
+
+        public string GetIssueJsonFromJira(long issueId)
+        {
+            RestClient client = new RestClient(_url + "/rest/api/2");
+            client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
+
+            RestRequest request = new RestRequest("issue/{issueId}", Method.GET);
+            request.AddUrlSegment("issueId", issueId);
+
+            IRestResponse response = client.Execute(request);
+            return response.Content;            
+        }
+        
+        public (string IssueKey, string IssueName) GetParentIssueFromJson(string json)
+        {
+            var tp = JsonConvert.DeserializeObject<JiraIssue>(json,
+                new JsonSerializerSettings
+                {
+                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                    DateParseHandling = DateParseHandling.None
+                }
+            );
+            string issueKey = string.Empty;
+            string issueName = string.Empty;
+
+            if (tp.Fields.Parent?.Fields != null)
+            {
+                issueKey = tp.Fields.Parent.Key;
+                issueName = tp.Fields.Parent.Fields.Summary;
+            }
+            
+            return (IssueKey: issueKey, IssueName: issueName);
         }
 
         public string GetTempoProjectNameFromJson(string json)
@@ -73,10 +111,10 @@ namespace jr.common.Jira
             return twi;
         }
 
-        public string GetProject(long projectId)
+        private string GetProject(long projectId)
         {
-            string json = this.GetProjectJsonFromJira(projectId);
-            string projectName = this.GetTempoProjectNameFromJson(json);
+            string json = GetProjectJsonFromJira(projectId);
+            string projectName = GetTempoProjectNameFromJson(json);
             return projectName;
         }
 
@@ -85,7 +123,7 @@ namespace jr.common.Jira
             return seconds > 0 ? seconds / 60.0 / 60.0 : 0;
         }
         
-        public List<WorkItem> ConvertTempoWorkItemListToWorkItems(List<TempoWorkItems> twi)
+        public List<WorkItem> ConvertTempoWorkItemListToWorkItems(List<TempoWorkItems> twi, bool getParentIssue = false)
         {
             List<WorkItem> wi = new List<WorkItem>();
             var projectLookup = new Dictionary<long, string>();
@@ -96,16 +134,25 @@ namespace jr.common.Jira
                 w.issueName = item.Issue.Summary;
                 w.billedHours = ConvertSecondsToHours(item.BilledSeconds);
                 w.userName = item.Author.Name;
+                
                 if (projectLookup.ContainsKey(item.Issue.ProjectId))
                 {
                     w.project = projectLookup.GetValueOrDefault(item.Issue.ProjectId);
                 }
                 else
                 {
-                    string projectName = this.GetProject(item.Issue.ProjectId);
+                    string projectName = GetProject(item.Issue.ProjectId);
                     projectLookup.Add(item.Issue.ProjectId, projectName);
                     w.project = projectName;
                 }
+
+                if (getParentIssue && item.Issue.IssueType.Name == "Sub-task")
+                {
+                    (string parentKey, string parentName) = GetParentIssueString(item.Issue.Id);
+                    w.issueKey = parentKey;
+                    w.issueName = parentName;
+                }
+                
                 wi.Add(w);
             }
             return wi;
