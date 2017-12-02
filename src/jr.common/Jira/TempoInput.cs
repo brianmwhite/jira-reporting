@@ -67,7 +67,9 @@ namespace jr.common.Jira
                 new JsonSerializerSettings
                 {
                     MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                    DateParseHandling = DateParseHandling.None
+                    DateParseHandling = DateParseHandling.None,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
                 }
             );
             string issueKey = string.Empty;

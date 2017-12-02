@@ -143,7 +143,10 @@ namespace jr
                                         userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
                                     
                                     List<TempoWorkItems> twi = ti.ConvertJsonToTempoWorkItemList(json);
-                                    List<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi);
+
+                                    bool getParentIssue = userOptions.Filtering.Groupby == "issue";
+                                    
+                                    List<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi, getParentIssue);
 
                                     var ts = new TimeSummarization(
                                         devRate: userOptions.BillingSetup.DevRate
