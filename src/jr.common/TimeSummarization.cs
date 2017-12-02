@@ -53,8 +53,8 @@ namespace jr.common
                         issue = x.First().combinedIssueName,
                         dev_rate = _devRate,
                         mgmt_rate = _mgmtRate,
-                        dev_hours = x.Sum(z => !_mgmtUsers.Contains(z.userName) ? z.billedHours : 0),
-                        mgmt_hours = x.Sum(z => _mgmtUsers.Contains(z.userName) ? z.billedHours : 0),
+                        dev_hours = x.Sum(z => GetHoursBasedOnRole(z, HourType.Developer)),
+                        mgmt_hours = x.Sum(z => GetHoursBasedOnRole(z, HourType.Manager)),
                     }
                 )
                 .OrderBy(x => x.billing_code)
@@ -65,13 +65,27 @@ namespace jr.common
             return summarizedWorkItems;
         }
 
+        public enum HourType
+        {
+            Manager,
+            Developer
+        }
+        
+        public double GetHoursBasedOnRole(WorkItem item, HourType hourType)
+        {
+            switch (hourType)
+            {
+                case HourType.Manager:
+                    return _mgmtUsers.Contains(item.userName) ? item.billedHours : 0;
+                default:
+                    return !_mgmtUsers.Contains(item.userName) ? item.billedHours : 0;
+            }
+        }
+
         private SummarizedItem AddSummarizedTotal(IReadOnlyCollection<SummarizedItem> summarizedWorkItems)
         {
-            SummarizedItem totalRow = new SummarizedItem()
+            var totalRow = new SummarizedItem()
             {
-                project = "",
-                //TODO: figure out how to get total in the first column regardless
-                issue = "",
                 dev_rate = _devRate,
                 mgmt_rate = _mgmtRate,
                 dev_hours = summarizedWorkItems.Sum(x => x.dev_hours),
@@ -121,7 +135,7 @@ namespace jr.common
                             break;
                         case ("Issue"):
                             values[dataRowNumber] = string.Format(culture, "{0}", row.issue);
-                            break;    
+                            break;
                         case ("Dev_Hours"):
                             values[dataRowNumber] = string.Format(culture, "{0:N2}", row.dev_hours);
                             break;
@@ -139,6 +153,9 @@ namespace jr.common
                             break;
                         case ("Total_Amount"):
                             values[dataRowNumber] = string.Format(culture, "{0:C}", row.total_amount);
+                            break;
+                        default:
+                            values[dataRowNumber] = string.Empty;
                             break;
                     }
                     dataRowNumber++;
