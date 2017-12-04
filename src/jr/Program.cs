@@ -142,11 +142,11 @@ namespace jr
                                     string json = ti.GetWorkItemsJsonFromTempo(userOptions.Filtering.DateStart,
                                         userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
                                     
-                                    List<TempoWorkItems> twi = ti.ConvertJsonToTempoWorkItemList(json);
+                                    IEnumerable<TempoWorkItems> twi = TempoInput.ConvertJsonToTempoWorkItemList(json);
 
                                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
                                     
-                                    List<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi, getParentIssue);
+                                    IEnumerable<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi, getParentIssue);
 
                                     var ts = new TimeSummarization(
                                         devRate: userOptions.BillingSetup.DevRate

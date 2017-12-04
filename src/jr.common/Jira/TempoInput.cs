@@ -43,7 +43,7 @@ namespace jr.common.Jira
             return response.Content;
         }
 
-        public (string IssueKey, string IssueName) GetParentIssueString(long issueId)
+        public (string IssueKey, string IssueName) GetParentIssue(long issueId)
         {
             string json = GetIssueJsonFromJira(issueId);
             return GetParentIssueFromJson(json);
@@ -84,7 +84,7 @@ namespace jr.common.Jira
             return (IssueKey: issueKey, IssueName: issueName);
         }
 
-        public string GetTempoProjectNameFromJson(string json)
+        public static string GetTempoProjectNameFromJson(string json)
         {
             var tp = JsonConvert.DeserializeObject<TempoProject>(json,
                 new JsonSerializerSettings
@@ -96,7 +96,7 @@ namespace jr.common.Jira
             return tp.Name;
         }
 
-        public List<TempoWorkItems> ConvertJsonToTempoWorkItemList(string json)
+        public static IEnumerable<TempoWorkItems> ConvertJsonToTempoWorkItemList(string json)
         {
             var twi = new List<TempoWorkItems>();
 
@@ -125,13 +125,13 @@ namespace jr.common.Jira
             return seconds > 0 ? seconds / 60.0 / 60.0 : 0;
         }
         
-        public List<WorkItem> ConvertTempoWorkItemListToWorkItems(List<TempoWorkItems> twi, bool getParentIssue = false)
+        public IEnumerable<WorkItem> ConvertTempoWorkItemListToWorkItems(IEnumerable<TempoWorkItems> twi, bool getParentIssue = false)
         {
-            List<WorkItem> wi = new List<WorkItem>();
+            var wi = new List<WorkItem>();
             var projectLookup = new Dictionary<long, string>();
             foreach (TempoWorkItems item in twi)
             {
-                WorkItem w = new WorkItem();
+                var w = new WorkItem();
                 w.issueKey = item.Issue.Key;
                 w.issueName = item.Issue.Summary;
                 w.billedHours = ConvertSecondsToHours(item.BilledSeconds);
@@ -150,7 +150,7 @@ namespace jr.common.Jira
 
                 if (getParentIssue && item.Issue.IssueType.Name == "Sub-task")
                 {
-                    (string parentKey, string parentName) = GetParentIssueString(item.Issue.Id);
+                    (string parentKey, string parentName) = GetParentIssue(item.Issue.Id);
                     w.issueKey = parentKey;
                     w.issueName = parentName;
                 }
