@@ -4,62 +4,62 @@ namespace jr.common.tests
 {
     public static class SetupData
     {
-        public static List<string[]>  CreateStringArrayListWithProjectGrouping() {
+        public static List<string[]>  CreateStringArrayList_GroupByProject() {
             List<string[]> s = new List<string[]>();
-            s.Add(new string[] {"Project","Dev Hours","Dev Amount","Mgmt Hours","Mgmt Amount","Total Hours","Total Amount"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","54.50","$0.00","4.00","$0.00","58.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 2 #ABC00006","12.00","$0.00","0.00","$0.00","12.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","25.00","$0.00","1.50","$0.00","26.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 4 #ABC00004","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"","92.00","$0.00","5.50","$0.00","97.50","$0.00"});
+            s.Add(new[] {"Project","Dev Hours","Dev Amount","Mgmt Hours","Mgmt Amount","Total Hours","Total Amount"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","54.50","$0.00","4.00","$0.00","58.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 2 #ABC00006","12.00","$0.00","0.00","$0.00","12.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","25.00","$0.00","1.50","$0.00","26.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 4 #ABC00004","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"","92.00","$0.00","5.50","$0.00","97.50","$0.00"});
             return s;
         }
         
-        public static List<string[]>  CreateStringArrayListWithIssueGrouping() {
+        public static List<string[]>  CreateStringArrayList_GroupByIssue() {
             List<string[]> s = new List<string[]>();
-            s.Add(new string[] {"Project","Issue","Dev Hours","Dev Amount","Mgmt Hours","Mgmt Amount","Total Hours","Total Amount"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-345] orci. Donec nibh.","5.00","$0.00","4.00","$0.00","9.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-415] fames ac turpis","2.50","$0.00","0.00","$0.00","2.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-419] Nullam ut nisi a odio semper cursus.","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-423] lacus. Aliquam rutrum lorem","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-443] enim nisl","3.50","$0.00","0.00","$0.00","3.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-444] hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit","12.50","$0.00","0.00","$0.00","12.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-445] dolor. Quisque tincidunt pede ac urna. Ut","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-446] semper cursus. Integer mollis. Integer tincidunt aliquam arcu. Aliquam","9.00","$0.00","0.00","$0.00","9.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-448] Aliquam adipiscing lobortis risus. In mi pede, nonummy","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-456] at lacus. Quisque purus sapien,","7.00","$0.00","0.00","$0.00","7.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-459] vitae velit egestas lacinia.","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-460] tempor lorem, eget mollis lectus","1.50","$0.00","0.00","$0.00","1.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-461] Donec tempus, lorem fringilla","4.00","$0.00","0.00","$0.00","4.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-462] placerat eget,","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 1 #ABC00001","[ABC-463] non, luctus sit amet, faucibus","4.00","$0.00","0.00","$0.00","4.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 2 #ABC00006","[BCD-106] turpis egestas. Aliquam fringilla","4.50","$0.00","0.00","$0.00","4.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 2 #ABC00006","[BCD-16] ut, molestie in, tempus","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 2 #ABC00006","[BCD-250] pellentesque a, facilisis non, bibendum","5.50","$0.00","0.00","$0.00","5.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 2 #ABC00006","[BCD-253] cursus, diam at pretium aliquet, metus urna","1.50","$0.00","0.00","$0.00","1.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-263] dictum augue malesuada malesuada. Integer id magna","5.00","$0.00","1.50","$0.00","6.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-844] risus. Donec egestas. Aliquam nec","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-872] sagittis. Nullam vitae diam. Proin","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-886] dignissim. Maecenas ornare egestas","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-897] ac metus vitae velit egestas lacinia. Sed congue,","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-903] sociis natoque","4.50","$0.00","0.00","$0.00","4.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-904] erat. Vivamus nisi. Mauris nulla. Integer","2.50","$0.00","0.00","$0.00","2.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-905] tincidunt. Donec vitae erat vel","4.50","$0.00","0.00","$0.00","4.50","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 3 #ABC00008","[CDE-906] Nunc ullamcorper,","6.00","$0.00","0.00","$0.00","6.00","$0.00"});
-            s.Add(new string[] {"Alpha Beta - Project 4 #ABC00004","[EFG-26] faucibus ut,","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
-            s.Add(new string[] {"","","92.00","$0.00","5.50","$0.00","97.50","$0.00"});
+            s.Add(new[] {"Project","Issue","Dev Hours","Dev Amount","Mgmt Hours","Mgmt Amount","Total Hours","Total Amount"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-345] orci. Donec nibh.","5.00","$0.00","4.00","$0.00","9.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-415] fames ac turpis","2.50","$0.00","0.00","$0.00","2.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-419] Nullam ut nisi a odio semper cursus.","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-423] lacus. Aliquam rutrum lorem","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-443] enim nisl","3.50","$0.00","0.00","$0.00","3.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-444] hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit","12.50","$0.00","0.00","$0.00","12.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-445] dolor. Quisque tincidunt pede ac urna. Ut","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-446] semper cursus. Integer mollis. Integer tincidunt aliquam arcu. Aliquam","9.00","$0.00","0.00","$0.00","9.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-448] Aliquam adipiscing lobortis risus. In mi pede, nonummy","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-456] at lacus. Quisque purus sapien,","7.00","$0.00","0.00","$0.00","7.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-459] vitae velit egestas lacinia.","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-460] tempor lorem, eget mollis lectus","1.50","$0.00","0.00","$0.00","1.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-461] Donec tempus, lorem fringilla","4.00","$0.00","0.00","$0.00","4.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-462] placerat eget,","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-463] non, luctus sit amet, faucibus","4.00","$0.00","0.00","$0.00","4.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 2 #ABC00006","[BCD-106] turpis egestas. Aliquam fringilla","4.50","$0.00","0.00","$0.00","4.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 2 #ABC00006","[BCD-16] ut, molestie in, tempus","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 2 #ABC00006","[BCD-250] pellentesque a, facilisis non, bibendum","5.50","$0.00","0.00","$0.00","5.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 2 #ABC00006","[BCD-253] cursus, diam at pretium aliquet, metus urna","1.50","$0.00","0.00","$0.00","1.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-263] dictum augue malesuada malesuada. Integer id magna","5.00","$0.00","1.50","$0.00","6.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-844] risus. Donec egestas. Aliquam nec","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-872] sagittis. Nullam vitae diam. Proin","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-886] dignissim. Maecenas ornare egestas","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-897] ac metus vitae velit egestas lacinia. Sed congue,","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-903] sociis natoque","4.50","$0.00","0.00","$0.00","4.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-904] erat. Vivamus nisi. Mauris nulla. Integer","2.50","$0.00","0.00","$0.00","2.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-905] tincidunt. Donec vitae erat vel","4.50","$0.00","0.00","$0.00","4.50","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 3 #ABC00008","[CDE-906] Nunc ullamcorper,","6.00","$0.00","0.00","$0.00","6.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 4 #ABC00004","[EFG-26] faucibus ut,","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
+            s.Add(new[] {"","","92.00","$0.00","5.50","$0.00","97.50","$0.00"});
             return s;
         }
 
-        public static List<SummarizedItem> CreateSummarizedItemListIssueGroupingWithTotals()
+        public static List<SummarizedItem> CreateSummarizedItemList_GroupByIssue_WithTotals()
         {
             List<SummarizedItem> si = new List<SummarizedItem>();
-            AddSummarizedIssueDataRows(si);
-            AddTotalSummarizedRow(si);
+            AddSummarizedItems_GroupByIssue(si);
+            CreateSummarizedItem_TotalRow(si);
             return si;
         }
 
-        private static void AddTotalSummarizedRow(List<SummarizedItem> si)
+        private static void CreateSummarizedItem_TotalRow(List<SummarizedItem> si)
         {
             si.Add(new SummarizedItem()
             {
@@ -72,15 +72,15 @@ namespace jr.common.tests
             });
         }
 
-        public static List<SummarizedItem> CreateSummarizedItemListProjectGroupingWithTotals()
+        public static List<SummarizedItem> CreateSummarizedItem_List_GroupByProject_WithTotals()
         {
             List<SummarizedItem> si = new List<SummarizedItem>();
-            AddSummarizedProjectDataRows(si);
-            AddTotalSummarizedRow(si);
+            AddSummarizedItems_GroupByProject(si);
+            CreateSummarizedItem_TotalRow(si);
             return si;
         }
 
-        private static void AddSummarizedProjectDataRows(List<SummarizedItem> si)
+        private static void AddSummarizedItems_GroupByProject(List<SummarizedItem> si)
         {
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", dev_rate = 0, mgmt_rate = 0, dev_hours = 54.5, mgmt_hours = 4 });
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 2 #ABC00006", dev_rate = 0, mgmt_rate = 0, dev_hours = 12, mgmt_hours = 0.00 });
@@ -88,7 +88,7 @@ namespace jr.common.tests
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 4 #ABC00004", dev_rate = 0, mgmt_rate = 0, dev_hours = 0.5, mgmt_hours = 0.00 });
         }
 
-        private static void AddSummarizedIssueDataRows(List<SummarizedItem> si)
+        private static void AddSummarizedItems_GroupByIssue(List<SummarizedItem> si)
         {
             //sample output example
             //output.AppendLine($"si.Add(new SummarizedItem() {{ project = \"{item.project}\", issue = \"{item.issue}\", dev_hours = {item.dev_hours}, mgmt_hours = {item.mgmt_hours}, dev_rate = 0, mgmt_rate = 0}});");

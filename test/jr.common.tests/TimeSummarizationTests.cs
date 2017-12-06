@@ -1,28 +1,28 @@
-using System;
+using System.Collections.Generic;
 using Xunit;
 using System.Linq;
-using System.Text;
 
 namespace jr.common.tests
 {
     public class TimeSummarizationTests
     {
         [Fact]
-        public void SummarizeWorkItemRowsGroupByProjectTest()
+        public void SummarizeWorkItems_GroupByProject_Test()
         {
-            var wi = SetupData.CreateWorkItemList();
+            List<WorkItem> wi = SetupData.CreateWorkItemList();
             
             string[] mgmt = { "bwall" };
-            var timeSummarizationData = new TimeSummarization(
+            TimeSummarization timeSummarizationData = new TimeSummarization(
                 devRate: 0
                 , mgmtRate: 0
                 , mgmtUsers: mgmt
                 , splitPo: false
                 , projectTextToTrim: ""
                 , outputColumns: "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                , groupByString: "project"
             );
             
-            var si = timeSummarizationData.SummarizeWorkItems(wi);
+            List<SummarizedItem> si = timeSummarizationData.SummarizeWorkItems(wi);
             Assert.Equal(4, si.Count);
             Assert.Equal(92, si.Sum(x => x.dev_hours));
             Assert.Equal(5.5, si.Sum(x => x.mgmt_hours));
@@ -30,12 +30,12 @@ namespace jr.common.tests
         }
         
         [Fact]
-        public void SummarizeWorkItemRowsGroupByIssueTest()
+        public void SummarizeWorkItem_GroupByIssue_Test()
         {
-            var wi = SetupData.CreateWorkItemList();
+            List<WorkItem> wi = SetupData.CreateWorkItemList();
             
             string[] mgmt = { "bwall" };
-            var timeSummarizationData = new TimeSummarization(
+            TimeSummarization timeSummarizationData = new TimeSummarization(
                 devRate: 0
                 , mgmtRate: 0
                 , mgmtUsers: mgmt
@@ -45,7 +45,7 @@ namespace jr.common.tests
                 , groupByString: "issue"
             );
             
-            var si = timeSummarizationData.SummarizeWorkItems(wi);
+            List<SummarizedItem> si = timeSummarizationData.SummarizeWorkItems(wi);
             
             Assert.Equal(29, si.Count);
             Assert.Equal(92, si.Sum(x => x.dev_hours));
@@ -54,33 +54,34 @@ namespace jr.common.tests
         }
 
         [Fact]
-        public void SummarizedItemsToStringArrayTest()
+        public void SummarizedItem_GroupByProject_ToStringArray_Test()
         {
-            var si = SetupData.CreateSummarizedItemListProjectGroupingWithTotals();
+            List<SummarizedItem> si = SetupData.CreateSummarizedItem_List_GroupByProject_WithTotals();
             
             string[] mgmt = { "bwall" };
-            var timeSummarizationData = new TimeSummarization(
+            TimeSummarization timeSummarizationData = new TimeSummarization(
                 devRate: 0
                 , mgmtRate: 0
                 , mgmtUsers: mgmt
                 , splitPo: false
                 , projectTextToTrim: ""
                 , outputColumns: "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                , groupByString: "project"
             );
             
-            var strOutput = timeSummarizationData.GenerateOutputData(si);
+            List<string[]> strOutput = timeSummarizationData.GenerateOutputData(si);
 
-            var expectedOutput = SetupData.CreateStringArrayListWithProjectGrouping();
+            List<string[]> expectedOutput = SetupData.CreateStringArrayList_GroupByProject();
             Assert.Equal(expectedOutput, strOutput);
         }
-
-        [Fact(Skip = "Not ready")]
-        public void IssueTest()
+        
+        [Fact]
+        public void SummarizedItem_GroupyByIssue_ToStringArray_Test()
         {
-            var wi = SetupData.CreateWorkItemList();
+            List<SummarizedItem> si = SetupData.CreateSummarizedItemList_GroupByIssue_WithTotals();
             
             string[] mgmt = { "bwall" };
-            var timeSummarizationData = new TimeSummarization(
+            TimeSummarization timeSummarizationData = new TimeSummarization(
                 devRate: 0
                 , mgmtRate: 0
                 , mgmtUsers: mgmt
@@ -90,28 +91,28 @@ namespace jr.common.tests
                 , groupByString: "issue"
             );
             
-            var si = timeSummarizationData.SummarizeWorkItems(wi);
+            List<string[]> strOutput = timeSummarizationData.GenerateOutputData(si);
 
-            var od = timeSummarizationData.GenerateOutputData(si);
-            var st = TimeSummarization.GenerateSeparatedValueTextOutput(od, '\t');
-            
-//            Console.WriteLine(st);
-//            var output = new StringBuilder();
-//            foreach (var item in si)
-//            {
-//                output.AppendLine($"si.Add(new SummarizedItem() {{ project = \"){item.project}\", issue = \"{item.issue}\", dev_hours = {item.dev_hours}, mgmt_hours = {item.mgmt_hours}, dev_rate = 0, mgmt_rate = 0}});");
-//            }
-//            string o = output.ToString();
-//            Console.WriteLine(o);
+            List<string[]> expectedOutput = SetupData.CreateStringArrayList_GroupByIssue();
+            Assert.Equal(expectedOutput, strOutput);
         }
-        
 
         [Fact]
-        public void TabSeparatedOutputTest()
+        public void GenerateSeparatedValueTextOutput_GroupByProject_Test()
         {
-            var strOutput = SetupData.CreateStringArrayListWithProjectGrouping();
-            var output = TimeSummarization.GenerateSeparatedValueTextOutput(strOutput, '\t');
-            var expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-project.txt");
+            List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByProject();
+            string output = TimeSummarization.GenerateSeparatedValueTextOutput(strOutput, '\t');
+            string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-project.txt");
+
+            Assert.Equal(expectedOutput, output);
+        }
+        
+        [Fact]
+        public void GenerateSeparatedValueTextOutput_GroupByIssue_Test()
+        {
+            List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByIssue();
+            string output = TimeSummarization.GenerateSeparatedValueTextOutput(strOutput, '\t');
+            string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-issue.txt");
 
             Assert.Equal(expectedOutput, output);
         }
