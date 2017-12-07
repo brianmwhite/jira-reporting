@@ -143,7 +143,7 @@ namespace jr
                                     string json = ti.GetWorkItemsJsonFromTempo(userOptions.Filtering.DateStart,
                                         userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
                                     
-                                    IEnumerable<TempoWorkItems> twi = TempoInput.ConvertJsonToTempoWorkItemList(json);
+                                    IEnumerable<TempoWorkItem> twi = TempoInput.ConvertJsonToTempoWorkItemList(json);
 
                                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
                                     

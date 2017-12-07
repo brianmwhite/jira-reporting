@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace jr.common.Jira.Models
 {
-    public class TempoWorkItems
+    public class TempoWorkItem
     {
         [JsonProperty("author")]
         public Author Author { get; set; }

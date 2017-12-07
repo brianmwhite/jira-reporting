@@ -97,11 +97,11 @@ namespace jr.common.Jira
             return tp.Name;
         }
 
-        public static IEnumerable<TempoWorkItems> ConvertJsonToTempoWorkItemList(string json)
+        public static IEnumerable<TempoWorkItem> ConvertJsonToTempoWorkItemList(string json)
         {
-            var twi = new List<TempoWorkItems>();
+            var twi = new List<TempoWorkItem>();
 
-            var arr = JsonConvert.DeserializeObject<TempoWorkItems[]>(json,
+            var arr = JsonConvert.DeserializeObject<TempoWorkItem[]>(json,
                 new JsonSerializerSettings
                 {
                     MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
@@ -126,11 +126,11 @@ namespace jr.common.Jira
             return seconds > 0 ? seconds / 60.0 / 60.0 : 0;
         }
         
-        public IEnumerable<WorkItem> ConvertTempoWorkItemListToWorkItems(IEnumerable<TempoWorkItems> twi, bool getParentIssue = false)
+        public IEnumerable<WorkItem> ConvertTempoWorkItemListToWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
         {
             var wi = new List<WorkItem>();
             var projectLookup = new Dictionary<long, string>();
-            foreach (TempoWorkItems item in twi)
+            foreach (TempoWorkItem item in twi)
             {
                 var w = new WorkItem();
                 w.issueKey = item.Issue.Key;
