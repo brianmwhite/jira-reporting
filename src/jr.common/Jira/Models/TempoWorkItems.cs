@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace jr.common.Jira
+namespace jr.common.Jira.Models
 {
     public class TempoWorkItems
     {
