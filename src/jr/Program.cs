@@ -140,23 +140,22 @@ namespace jr
                                         }
                                     }
                                     
-                                    string json = ti.GetTempoWorkItemJson(userOptions.Filtering.DateStart,
-                                        userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
-                                    
-                                    IEnumerable<TempoWorkItem> twi = TempoInput.DeserializeTempoWorkItems(json);
-
                                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
                                     
-                                    IEnumerable<WorkItem> wi = ti.ConvertTempoWorkItems(twi, getParentIssue);
+                                    IEnumerable<WorkItem> wi = ti.GetWorkItems(
+                                        userOptions.Filtering.DateStart,
+                                        userOptions.Filtering.DateEnd, 
+                                        userOptions.Filtering.Account, 
+                                        getParentIssue);
 
                                     var ts = new TimeSummarization(
-                                        devRate: userOptions.BillingSetup.DevRate
-                                        , mgmtRate: userOptions.BillingSetup.MgmtRate
-                                        , mgmtUsers: userOptions.BillingSetup.MgmtUsernames
-                                        , splitPo: userOptions.Advanced.SplitPo
-                                        , projectTextToTrim: userOptions.Advanced.Trim
-                                        , outputColumns: userOptions.Output.Col
-                                        , groupByString: userOptions.Filtering.Groupby
+                                        userOptions.BillingSetup.DevRate
+                                        , userOptions.BillingSetup.MgmtRate
+                                        , userOptions.BillingSetup.MgmtUsernames
+                                        , userOptions.Advanced.SplitPo
+                                        , userOptions.Advanced.Trim
+                                        , userOptions.Output.Col
+                                        , userOptions.Filtering.Groupby
                                     );
 
                                     string tempoOutput = ts.GenerateSummaryText(wi);

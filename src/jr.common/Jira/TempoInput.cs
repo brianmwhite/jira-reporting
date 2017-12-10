@@ -12,18 +12,18 @@ namespace jr.common.Jira
         {
         }
 
-        public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey)
+        public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey, bool getParentIssue = false)
         {
-            string json = GetTempoWorkItemJson(dateFrom, dateTo, accountKey);
-            IEnumerable<TempoWorkItem> twi = DeserializeTempoWorkItems(json);
-            IEnumerable<WorkItem> wi = ConvertTempoWorkItems(twi);
+            string json = _GetTempoWorkItemJson(dateFrom, dateTo, accountKey);
+            IEnumerable<TempoWorkItem> twi = _DeserializeTempoWorkItems(json);
+            IEnumerable<WorkItem> wi = _ConvertTempoWorkItems(twi, getParentIssue);
             return wi;
         }
        
-        public string GetTempoWorkItemJson(string dateFrom, string dateTo, string accountKey)
+        public string _GetTempoWorkItemJson(string dateFrom, string dateTo, string accountKey)
         {
-            RestClient client = new RestClient(_url + "/rest/tempo-timesheets/3/");
-            client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
+            RestClient client = new RestClient(Url + "/rest/tempo-timesheets/3/");
+            client.Authenticator = new HttpBasicAuthenticator(User, Pwd);
 
             RestRequest request = new RestRequest("worklogs", Method.GET);
             request.AddQueryParameter("dateFrom", dateFrom);
@@ -34,7 +34,7 @@ namespace jr.common.Jira
             return response.Content;
         }
 
-        public static IEnumerable<TempoWorkItem> DeserializeTempoWorkItems(string json)
+        public static IEnumerable<TempoWorkItem> _DeserializeTempoWorkItems(string json)
         {
             var twi = new List<TempoWorkItem>();
 
@@ -51,7 +51,7 @@ namespace jr.common.Jira
             return twi;
         }
 
-        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
+        public IEnumerable<WorkItem> _ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
         {
             var wi = new List<WorkItem>();
             var projectLookup = new Dictionary<long, string>();
@@ -69,7 +69,7 @@ namespace jr.common.Jira
                 }
                 else
                 {
-                    string projectName = GetProject(item.Issue.ProjectId);
+                    string projectName = GetProjectName(item.Issue.ProjectId);
                     projectLookup.Add(item.Issue.ProjectId, projectName);
                     w.project = projectName;
                 }

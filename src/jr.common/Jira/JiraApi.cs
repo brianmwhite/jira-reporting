@@ -7,48 +7,35 @@ namespace jr.common.Jira
 {
     public class JiraApi
     {
-
-        protected string _url;
-        protected string _user;
-        protected string _pwd;
+        protected readonly string Pwd;
+        protected readonly string Url;
+        protected readonly string User;
 
         public JiraApi(string url, string user, string pwd)
         {
-            _pwd = pwd;
-            _user = user;
-            _url = url;
+            Pwd = pwd;
+            User = user;
+            Url = url;
         }
 
         public static double ConvertSecondsToHours(long seconds)
         {
             return seconds > 0 ? seconds / 60.0 / 60.0 : 0;
         }
-        
-        public string GetProjectJsonFromJira(long projectId)
+
+        public string _GetJiraIssueJson(long issueId)
         {
-            RestClient client = new RestClient(_url + "/rest/api/2/");
-            client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
+            var client = new RestClient(Url + "/rest/api/2");
+            client.Authenticator = new HttpBasicAuthenticator(User, Pwd);
 
-            RestRequest request = new RestRequest("project/{projectIdOrKey}", Method.GET);
-            request.AddUrlSegment("projectIdOrKey", projectId);
-
-            IRestResponse response = client.Execute(request);
-            return response.Content;
-        }
-        
-        public string GetIssueJsonFromJira(long issueId)
-        {
-            RestClient client = new RestClient(_url + "/rest/api/2");
-            client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
-
-            RestRequest request = new RestRequest("issue/{issueId}", Method.GET);
+            var request = new RestRequest("issue/{issueId}", Method.GET);
             request.AddUrlSegment("issueId", issueId);
 
-            IRestResponse response = client.Execute(request);
-            return response.Content;            
+            var response = client.Execute(request);
+            return response.Content;
         }
 
-        public (string IssueKey, string IssueName) GetParentIssueFromJson(string json)
+        private static JiraIssue _DeserializeJiraIssue(string json)
         {
             var tp = JsonConvert.DeserializeObject<JiraIssue>(json,
                 new JsonSerializerSettings
@@ -59,25 +46,49 @@ namespace jr.common.Jira
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 }
             );
-            string issueKey = string.Empty;
-            string issueName = string.Empty;
-
-            if (tp.Fields.Parent?.Fields != null)
-            {
-                issueKey = tp.Fields.Parent.Key;
-                issueName = tp.Fields.Parent.Fields.Summary;
-            }
-            
-            return (IssueKey: issueKey, IssueName: issueName);
+            return tp;
+        }
+        
+        public JiraIssue GetJiraIssue(long issueId)
+        {
+            var json = _GetJiraIssueJson(issueId);
+            var ji = _DeserializeJiraIssue(json);
+            return ji;
         }
 
         public (string IssueKey, string IssueName) GetParentIssue(long issueId)
         {
-            string json = GetIssueJsonFromJira(issueId);
-            return GetParentIssueFromJson(json);
+            var ji = GetJiraIssue(issueId);
+            return _GetParentIssueFields(ji);
+        }
+
+        public (string IssueKey, string IssueName) _GetParentIssueFields(JiraIssue ji)
+        {
+            var issueKey = string.Empty;
+            var issueName = string.Empty;
+
+            if (ji.Fields.Parent?.Fields != null)
+            {
+                issueKey = ji.Fields.Parent.Key;
+                issueName = ji.Fields.Parent.Fields.Summary;
+            }
+
+            return (IssueKey: issueKey, IssueName: issueName);
         }
         
-        public static string GetJiraProjectNameFromJson(string json)
+        public string _GetJiraProjectJson(long projectId)
+        {
+            var client = new RestClient(Url + "/rest/api/2/");
+            client.Authenticator = new HttpBasicAuthenticator(User, Pwd);
+
+            var request = new RestRequest("project/{projectIdOrKey}", Method.GET);
+            request.AddUrlSegment("projectIdOrKey", projectId);
+
+            var response = client.Execute(request);
+            return response.Content;
+        }
+        
+        public static JiraProject _DeserializeJiraProject(string json)
         {
             var tp = JsonConvert.DeserializeObject<JiraProject>(json,
                 new JsonSerializerSettings
@@ -86,13 +97,20 @@ namespace jr.common.Jira
                     DateParseHandling = DateParseHandling.None
                 }
             );
-            return tp.Name;
+            return tp;
+        }
+        
+        public JiraProject GetJiraProject(long projectId)
+        {
+            var json = _GetJiraProjectJson(projectId);
+            var jp = _DeserializeJiraProject(json);
+            return jp;
         }
 
-        public string GetProject(long projectId)
+        public string GetProjectName(long projectId)
         {
-            string json = GetProjectJsonFromJira(projectId);
-            string projectName = GetJiraProjectNameFromJson(json);
+            var jp = GetJiraProject(projectId);
+            var projectName = jp.Name;
             return projectName;
         }
     }
