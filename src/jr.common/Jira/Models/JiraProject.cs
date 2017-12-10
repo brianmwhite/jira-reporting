@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace jr.common.Jira.Models
 {
-    public class TempoProject
+    public class JiraProject
     {
 //        [JsonProperty("components")]
 //        public Component[] Components { get; set; }
