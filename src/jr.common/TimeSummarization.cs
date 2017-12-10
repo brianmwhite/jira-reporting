@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using FluentDateTime;
 
 namespace jr.common
 {
@@ -42,6 +44,48 @@ namespace jr.common
             return GenerateSeparatedValueTextOutput(dataTable, '\t');
         }
 
+        public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString)
+        {
+            string datestart = "";
+            string dateend = "";
+            switch (timePeriodString)
+            {
+                case "ytd":
+                    datestart = DateTime.Now.FirstDayOfYear()
+                        .ToString("yyyy-MM-dd");
+                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    break;
+                case "month":
+                    datestart = DateTime.Now.FirstDayOfMonth()
+                        .ToString("yyyy-MM-dd");
+                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    break;
+                case "lastmonth":
+                    datestart = DateTime.Now.PreviousMonth()
+                        .FirstDayOfMonth().ToString("yyyy-MM-dd");
+                    dateend = DateTime.Now.PreviousMonth()
+                        .LastDayOfMonth().ToString("yyyy-MM-dd");
+                    break;
+                case "week":
+                    datestart = DateTime.Now.FirstDayOfWeek()
+                        .FirstDayOfMonth().ToString("yyyy-MM-dd");
+                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    break;
+                case "lastweek":
+                    datestart = DateTime.Now.WeekEarlier()
+                        .FirstDayOfWeek().ToString("yyyy-MM-dd");
+                    dateend = DateTime.Now.WeekEarlier()
+                        .LastDayOfWeek().ToString("yyyy-MM-dd");
+                    break;
+                default:
+                    datestart = DateTime.Now.FirstDayOfMonth()
+                        .ToString("yyyy-MM-dd");
+                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    break;
+            }
+            return (datestart, dateend);
+        }
+        
         public List<SummarizedItem> SummarizeWorkItems(IEnumerable<WorkItem> workItems)
         {
             var summarizedWorkItems = workItems

@@ -86,41 +86,8 @@ namespace jr
                                     }
                                     else if (optionTimePeriod.HasValue())
                                     {
-                                        switch (optionTimePeriod.Value())
-                                        {
-                                            case "ytd":
-                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfYear()
-                                                    .ToString("yyyy-MM-dd");
-                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
-                                                break;
-                                            case "month":
-                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfMonth()
-                                                    .ToString("yyyy-MM-dd");
-                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
-                                                break;
-                                            case "lastmonth":
-                                                userOptions.Filtering.DateStart = DateTime.Now.PreviousMonth()
-                                                    .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                                                userOptions.Filtering.DateEnd = DateTime.Now.PreviousMonth()
-                                                    .LastDayOfMonth().ToString("yyyy-MM-dd");
-                                                break;
-                                            case "week":
-                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfWeek()
-                                                    .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
-                                                break;
-                                            case "lastweek":
-                                                userOptions.Filtering.DateStart = DateTime.Now.WeekEarlier()
-                                                    .FirstDayOfWeek().ToString("yyyy-MM-dd");
-                                                userOptions.Filtering.DateEnd = DateTime.Now.WeekEarlier()
-                                                    .LastDayOfWeek().ToString("yyyy-MM-dd");
-                                                break;
-                                            default:
-                                                userOptions.Filtering.DateStart = DateTime.Now.FirstDayOfMonth()
-                                                    .ToString("yyyy-MM-dd");
-                                                userOptions.Filtering.DateEnd = DateTime.Now.ToString("yyyy-MM-dd");
-                                                break;
-                                        }
+                                        (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) 
+                                            = TimeSummarization.GetTimePeriodOption(optionTimePeriod.Value());
                                     }
                                     if (optionAccount.HasValue())
                                     {
@@ -245,7 +212,7 @@ namespace jr
 
         private static string GenerateSummaryFromFile(Options userOptions, string inputSourceLocation)
         {
-            var workItems = ExtractWorkItemsFromExcel(inputSourceLocation);
+            var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
 
             var ts = new TimeSummarization(
                 devRate: userOptions.BillingSetup.DevRate
@@ -258,19 +225,6 @@ namespace jr
             );
 
             return ts.GenerateSummaryText(workItems);
-        }
-
-        private static List<WorkItem> ExtractWorkItemsFromExcel(string inputSourceLocation)
-        {
-            List<WorkItem> workItems = new List<WorkItem>();
-            //if the input file has an excel extension parse it with ExcelDataReader
-            if (inputSourceLocation.EndsWith(".xls") || inputSourceLocation.EndsWith(".xlsx"))
-            {
-                ExcelInput excel = new ExcelInput();
-                workItems = excel.ReadExcel(inputSourceLocation);
-            }
-
-            return workItems;
         }
     }
 }

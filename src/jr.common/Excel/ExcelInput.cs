@@ -82,5 +82,17 @@ namespace jr.common.Excel
             }
             return workItems;
         }
+        public static List<WorkItem> ExtractWorkItemsFromExcel(string inputSourceLocation)
+        {
+            List<WorkItem> workItems = new List<WorkItem>();
+            //if the input file has an excel extension parse it with ExcelDataReader
+            if (inputSourceLocation.EndsWith(".xls") || inputSourceLocation.EndsWith(".xlsx"))
+            {
+                ExcelInput excel = new ExcelInput();
+                workItems = excel.ReadExcel(inputSourceLocation);
+            }
+
+            return workItems;
+        }
     }
 }
