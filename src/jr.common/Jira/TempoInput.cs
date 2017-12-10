@@ -12,7 +12,15 @@ namespace jr.common.Jira
         {
         }
 
-        public string GetWorkItemsJsonFromTempo(string dateFrom, string dateTo, string accountKey)
+        public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey)
+        {
+            string json = GetTempoWorkItemJson(dateFrom, dateTo, accountKey);
+            IEnumerable<TempoWorkItem> twi = DeserializeTempoWorkItems(json);
+            IEnumerable<WorkItem> wi = ConvertTempoWorkItems(twi);
+            return wi;
+        }
+       
+        public string GetTempoWorkItemJson(string dateFrom, string dateTo, string accountKey)
         {
             RestClient client = new RestClient(_url + "/rest/tempo-timesheets/3/");
             client.Authenticator = new HttpBasicAuthenticator(_user, _pwd);
@@ -26,7 +34,7 @@ namespace jr.common.Jira
             return response.Content;
         }
 
-        public static IEnumerable<TempoWorkItem> ConvertJsonToTempoWorkItemList(string json)
+        public static IEnumerable<TempoWorkItem> DeserializeTempoWorkItems(string json)
         {
             var twi = new List<TempoWorkItem>();
 
@@ -43,7 +51,7 @@ namespace jr.common.Jira
             return twi;
         }
 
-        public IEnumerable<WorkItem> ConvertTempoWorkItemListToWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
+        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
         {
             var wi = new List<WorkItem>();
             var projectLookup = new Dictionary<long, string>();

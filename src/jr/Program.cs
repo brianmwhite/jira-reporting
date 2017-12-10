@@ -140,14 +140,14 @@ namespace jr
                                         }
                                     }
                                     
-                                    string json = ti.GetWorkItemsJsonFromTempo(userOptions.Filtering.DateStart,
+                                    string json = ti.GetTempoWorkItemJson(userOptions.Filtering.DateStart,
                                         userOptions.Filtering.DateEnd, userOptions.Filtering.Account);
                                     
-                                    IEnumerable<TempoWorkItem> twi = TempoInput.ConvertJsonToTempoWorkItemList(json);
+                                    IEnumerable<TempoWorkItem> twi = TempoInput.DeserializeTempoWorkItems(json);
 
                                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
                                     
-                                    IEnumerable<WorkItem> wi = ti.ConvertTempoWorkItemListToWorkItems(twi, getParentIssue);
+                                    IEnumerable<WorkItem> wi = ti.ConvertTempoWorkItems(twi, getParentIssue);
 
                                     var ts = new TimeSummarization(
                                         devRate: userOptions.BillingSetup.DevRate
