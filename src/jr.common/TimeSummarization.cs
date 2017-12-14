@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using BetterConsoleTables;
 using FluentDateTime;
 
 namespace jr.common
@@ -36,18 +37,52 @@ namespace jr.common
                 : outputColumns;
         }
 
-        public string GenerateSummaryText(IEnumerable<WorkItem> workItems)
+        public enum OutputFormat
+        {
+            Csv,
+            Tab,
+            Pretty
+        }
+        
+        public string GenerateSummaryText(IEnumerable<WorkItem> workItems, OutputFormat format)
         {
             var si = SummarizeWorkItems(workItems);
             si.Add(AddSummarizedTotal(si));
-            var dataTable = GenerateOutputData(si);
-            return GenerateSeparatedValueTextOutput(dataTable, '\t');
+            List<string[]> dataTable = GenerateOutputData(si);
+            string output;
+            switch (format)
+            {
+                case OutputFormat.Csv:
+                    output = GenerateSeparatedValueTextOutput(dataTable, ',');
+                    break;
+                case OutputFormat.Tab:
+                    output = GenerateSeparatedValueTextOutput(dataTable, '\t');
+                    break;
+                default:
+                    output = GeneratePrettyOutput(dataTable);
+                    break;
+            }
+            return output;
         }
 
+        public static string GeneratePrettyOutput(List<string[]> dataTable)
+        {
+            var table = new Table();
+            
+            var header = dataTable[0];
+            table.AddColumns(header);
+            
+            //remove header row
+            dataTable.RemoveAt(0);
+            table.AddRows(dataTable);
+            
+            return table.ToString();
+        }
+        
         public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString)
         {
-            string datestart = "";
-            string dateend = "";
+            string datestart;
+            string dateend;
             switch (timePeriodString)
             {
                 case "ytd":

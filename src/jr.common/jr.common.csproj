@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="BetterConsoleTables" Version="1.0.0" />
     <PackageReference Include="FluentDateTime" Version="1.14.0" />
     <PackageReference Include="RestSharp" Version="106.1.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />

@@ -61,6 +61,9 @@ namespace jr
                     var optionGroupBy = command.Option("-g|--groupby <groupby>", "Group by <project>, <issue>",
                         CommandOptionType.SingleValue);
 
+                    var optionSeparatorOutput = command.Option("-o|--output <output>", "csv,tab,pretty"
+                        , CommandOptionType.SingleValue);
+
                     command.OnExecute(() =>
                     {
                         userOptions = GetUserOptions(optionConfigFileLocation);
@@ -106,26 +109,18 @@ namespace jr
                                             userOptions.Filtering.Groupby = "project";
                                         }
                                     }
+                                    if (optionSeparatorOutput.HasValue())
+                                    {
+                                        userOptions.Output.Separator = optionSeparatorOutput.Value();
+                                    }
                                     
                                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
                                     
-                                    IEnumerable<WorkItem> wi = ti.GetWorkItems(
-                                        userOptions.Filtering.DateStart,
-                                        userOptions.Filtering.DateEnd, 
-                                        userOptions.Filtering.Account, 
-                                        getParentIssue);
+                                    var wi = ti.GetWorkItems(
+                                        userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd, 
+                                        userOptions.Filtering.Account, getParentIssue);
 
-                                    var ts = new TimeSummarization(
-                                        userOptions.BillingSetup.DevRate
-                                        , userOptions.BillingSetup.MgmtRate
-                                        , userOptions.BillingSetup.MgmtUsernames
-                                        , userOptions.Advanced.SplitPo
-                                        , userOptions.Advanced.Trim
-                                        , userOptions.Output.Col
-                                        , userOptions.Filtering.Groupby
-                                    );
-
-                                    string tempoOutput = ts.GenerateSummaryText(wi);
+                                    var tempoOutput = GenerateSummaryText(userOptions, wi);
                                     Console.WriteLine(tempoOutput);
 
                                     break;
@@ -141,7 +136,8 @@ namespace jr
                                             Console.Error.WriteLine(string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
                                         }
 
-                                        string output = GenerateSummaryFromFile(userOptions, inputSourceLocation);
+                                        var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
+                                        var output = GenerateSummaryText(userOptions, workItems);
                                         Console.WriteLine(output);
                                     }
                                     break;
@@ -210,21 +206,29 @@ namespace jr
             });
         }
 
-        private static string GenerateSummaryFromFile(Options userOptions, string inputSourceLocation)
+        private static string GenerateSummaryText(Options userOptions, IEnumerable<WorkItem> workItems)
         {
-            var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
-
             var ts = new TimeSummarization(
-                devRate: userOptions.BillingSetup.DevRate
-                , mgmtRate: userOptions.BillingSetup.MgmtRate
-                , mgmtUsers: userOptions.BillingSetup.MgmtUsernames
-                , splitPo: userOptions.Advanced.SplitPo
-                , projectTextToTrim: userOptions.Advanced.Trim
-                , outputColumns: userOptions.Output.Col
-                , groupByString: userOptions.Filtering.Groupby
+                userOptions.BillingSetup.DevRate
+                , userOptions.BillingSetup.MgmtRate
+                , userOptions.BillingSetup.MgmtUsernames
+                , userOptions.Advanced.SplitPo
+                , userOptions.Advanced.Trim
+                , userOptions.Output.Col
+                , userOptions.Filtering.Groupby
             );
 
-            return ts.GenerateSummaryText(workItems);
+            var outputformat = TimeSummarization.OutputFormat.Pretty;
+            switch (userOptions.Output.Separator.ToLower())
+            {
+                case "csv":
+                    outputformat = TimeSummarization.OutputFormat.Csv;
+                    break;
+                case "tab":
+                    outputformat = TimeSummarization.OutputFormat.Tab;
+                    break;
+            }
+            return ts.GenerateSummaryText(workItems, outputformat);
         }
     }
 }

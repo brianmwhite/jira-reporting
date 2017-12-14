@@ -40,11 +40,11 @@ namespace jr
         [JsonProperty("col")]
         public string Col { get; set; }
 
-        [JsonProperty("pretty")]
-        public bool Pretty { get; set; }
-
         [JsonProperty("sort")]
         public string Sort { get; set; }
+
+        [JsonProperty("separator")]
+        public string Separator { get; set; } = string.Empty;
     }
 
     public class Filtering
