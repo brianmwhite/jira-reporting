@@ -1,19 +1,18 @@
 //TODO: add isolated tests, create test data
 
-using System;
 using System.Collections.Generic;
 using jr.common.Jira;
 using Xunit;
 //
 namespace jr.common.tests
 {
-    public class TempoTests
+    public class JiraApiTests
     {
         [Fact]
         public void ConvertSecondsToHoursTest()
         {
             const double expectedHours = 5.25;
-            double actualHours = TempoInput.ConvertSecondsToHours(18900);
+            double actualHours = JiraApi.ConvertSecondsToHours(18900);
             Assert.Equal(expectedHours, actualHours);
         }
         
@@ -21,7 +20,7 @@ namespace jr.common.tests
         public void ConvertSecondsToHoursZeroTest()
         {
             const double expectedHours = 0;
-            double actualHours = TempoInput.ConvertSecondsToHours(0);
+            double actualHours = JiraApi.ConvertSecondsToHours(0);
             Assert.Equal(expectedHours, actualHours);
         }
         
@@ -29,7 +28,7 @@ namespace jr.common.tests
         public void ConvertSecondsToHoursNegativeTest()
         {
             const double expectedHours = 0;
-            double actualHours = TempoInput.ConvertSecondsToHours(-1000);
+            double actualHours = JiraApi.ConvertSecondsToHours(-1000);
             Assert.Equal(expectedHours, actualHours);
         }
         
@@ -84,5 +83,78 @@ namespace jr.common.tests
 //            var si = timeSummarizationData.SummarizeWorkItems(wi);
 //            Assert.NotEqual(string.Empty, outputJson);
 //        }
+
+        [Fact]
+        public void GetNumberPagesTest()
+        {
+            const int total = 64;
+            const int maxResults = 50;
+            
+            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+
+            int[] expectedPages = {50};
+            Assert.Equal(expectedPages, pages);
+        }
+        
+        [Fact]
+        public void GetNumberPagesBigNumberTest()
+        {
+            const int total = 1203;
+            const int maxResults = 50;
+            
+            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+
+            int[] expectedPages = {50,100,150,200,250,300,350,400,450,500,550,600,650
+                                   ,700,750,800,850,900,950,1000,1050,1100,1150,1200};
+            Assert.Equal(expectedPages, pages);
+        }
+        
+        [Fact]
+        public void GetNumberPagesSmallNumberTest()
+        {
+            const int total = 32;
+            const int maxResults = 50;
+            
+            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+
+            int[] expectedPages = {};
+            Assert.Equal(expectedPages, pages);
+        }
+        
+        [Fact]
+        public void GetNumberPagesSameAsPageSizeTest()
+        {
+            const int total = 50;
+            const int maxResults = 50;
+            
+            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+
+            int[] expectedPages = {};
+            Assert.Equal(expectedPages, pages);
+        }
+        
+        [Fact]
+        public void GetNumberPagesTriplePageSizeTest()
+        {
+            const int total = 150;
+            const int maxResults = 50;
+            
+            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+
+            int[] expectedPages = {50,100};
+            Assert.Equal(expectedPages, pages);
+        }
+        
+        [Fact]
+        public void GetNumberPagesNoResultsTest()
+        {
+            const int total = 0;
+            const int maxResults = 50;
+            
+            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+
+            int[] expectedPages = {};
+            Assert.Equal(expectedPages, pages);
+        }
     }
 }

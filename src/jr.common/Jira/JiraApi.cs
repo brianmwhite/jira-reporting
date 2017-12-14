@@ -1,4 +1,5 @@
-﻿using jr.common.Jira.Models;
+﻿using System.Collections.Generic;
+using jr.common.Jira.Models;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
@@ -21,6 +22,16 @@ namespace jr.common.Jira
         public static double ConvertSecondsToHours(long seconds)
         {
             return seconds > 0 ? seconds / 60.0 / 60.0 : 0;
+        }
+        
+        public static int[] GetPagingStartPageNumbers(int total, int maxResults)
+        {
+            var results = new List<int>();
+            for (var x = maxResults; x < total; x += maxResults)
+            {
+                results.Add(x);
+            }
+            return results.ToArray();
         }
 
         public string _GetJiraIssueJson(long issueId)
