@@ -14,13 +14,13 @@ namespace jr.common.Jira.Models
     public class IssueFields
     {
         [JsonProperty("aggregatetimeestimate")]
-        public long TotalEstimate { get; set; }
+        public long? TotalEstimate { get; set; }
 
         [JsonProperty("aggregatetimeoriginalestimate")]
-        public long TotalOriginalEstimate { get; set; }
+        public long? TotalOriginalEstimate { get; set; }
 
         [JsonProperty("aggregatetimespent")]
-        public long TotalTimeSpent { get; set; }
+        public long? TotalTimeSpent { get; set; }
 
         [JsonProperty("issuetype")]
         public Issuetype Issuetype { get; set; }
@@ -39,6 +39,21 @@ namespace jr.common.Jira.Models
 
         [JsonProperty("summary")]
         public string Summary { get; set; }
+
+        [JsonProperty("customfield_10008")]
+        public string EpicName {get; set;}
+        
+        [JsonProperty("customfield_10004")]
+        public long? StoryPoints {get; set;}
+        
+        [JsonProperty("customfield_11600")]
+        public string Team {get; set;}
+        
+        [JsonProperty("customfield_10006")]
+        public string[] SprintObjects { get; set; }
+        
+        [JsonProperty("fixVersions")]
+        public FixVersion[] FixVersions { get; set; }
     }
 
     public class Project
@@ -93,5 +108,20 @@ namespace jr.common.Jira.Models
 
         [JsonProperty("name")]
         public string Name { get; set; }
+    }
+
+    public class FixVersion
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        
+        [JsonProperty("archived")]
+        public bool Archived { get; set; }
+        
+        [JsonProperty("released")]
+        public bool Released { get; set; }
+        
+        [JsonProperty("releaseDate")]
+        public string ReleaseDate { get; set; }
     }
 }

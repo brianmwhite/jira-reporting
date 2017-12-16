@@ -6,7 +6,6 @@ using McMaster.Extensions.CommandLineUtils;
 using jr.common;
 using jr.common.Excel;
 using jr.common.Jira;
-using jr.common.Jira.Models;
 using Newtonsoft.Json;
 
 //quicktype -o Options.cs --namespace "jr" sample.json

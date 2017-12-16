@@ -1,6 +1,6 @@
 //TODO: add isolated tests, create test data
 
-using System.Collections.Generic;
+using jr.common;
 using jr.common.Jira;
 using Xunit;
 //
@@ -31,7 +31,32 @@ namespace jr.common.tests
             double actualHours = JiraApi.ConvertSecondsToHours(-1000);
             Assert.Equal(expectedHours, actualHours);
         }
+
+        [Fact]
+        public void ExtractSprintNameTest()
+        {
+            const string sprintString = "com.atlassian.greenhopper.service.sprint.Sprint@215201cd[id=348,rapidViewId=176,state=CLOSED,name=Sprint 15,goal=<null>,startDate=2016-04-18T14:40:01.457Z,endDate=2016-04-29T14:40:00.000Z,completeDate=2016-04-29T14:52:52.537Z,sequence=341]";
+            string sprintName = JiraApi.ExtractSprintName(sprintString);
+            Assert.Equal("Sprint 15", sprintName);
+        }
         
+        [Fact]
+        public void ExtractSprintNameEmptyTest()
+        {
+            const string sprintString = "";
+            string sprintName = JiraApi.ExtractSprintName(sprintString);
+            Assert.Equal("", sprintName);
+        }
+
+//        [Fact]
+//        public void TestJiraIssueSearchTemp()
+//        {
+//            JiraApi ja = new JiraApi("","","");
+//            var jir = ja._GetJiraIssueResults("");
+//            var ir = ja._ConvertJiraIssueResults(jir);
+//            Assert.Equal(453, ir.Count);
+//        }
+//        
 //        private readonly string _dateTo;
 //        private readonly string _dateFrom;
 //        private readonly string _accountKey;
