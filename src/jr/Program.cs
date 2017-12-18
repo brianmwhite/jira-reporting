@@ -6,6 +6,7 @@ using McMaster.Extensions.CommandLineUtils;
 using jr.common;
 using jr.common.Excel;
 using jr.common.Jira;
+using jr.common.Models;
 using Newtonsoft.Json;
 
 //quicktype -o Options.cs --namespace "jr" sample.json
@@ -89,7 +90,7 @@ namespace jr
                                     else if (optionTimePeriod.HasValue())
                                     {
                                         (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) 
-                                            = TimeSummarization.GetTimePeriodOption(optionTimePeriod.Value());
+                                            = OutputUtils.GetTimePeriodOption(optionTimePeriod.Value());
                                     }
                                     if (optionAccount.HasValue())
                                     {
@@ -217,14 +218,14 @@ namespace jr
                 , userOptions.Filtering.Groupby
             );
 
-            var outputformat = TimeSummarization.OutputFormat.Pretty;
+            var outputformat = OutputUtils.OutputFormat.Pretty;
             switch (userOptions.Output.Separator.ToLower())
             {
                 case "csv":
-                    outputformat = TimeSummarization.OutputFormat.Csv;
+                    outputformat = OutputUtils.OutputFormat.Csv;
                     break;
                 case "tab":
-                    outputformat = TimeSummarization.OutputFormat.Tab;
+                    outputformat = OutputUtils.OutputFormat.Tab;
                     break;
             }
             return ts.GenerateSummaryText(workItems, outputformat);

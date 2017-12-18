@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using jr.common.Models;
 using Xunit;
 
 namespace jr.common.tests

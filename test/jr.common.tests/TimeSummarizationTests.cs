@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
 using System.Linq;
+using jr.common.Models;
 
 namespace jr.common.tests
 {
@@ -101,7 +102,7 @@ namespace jr.common.tests
         public void GenerateSeparatedValueTextOutput_GroupByProject_Test()
         {
             List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByProject();
-            string output = TimeSummarization.GenerateSeparatedValueTextOutput(strOutput, '\t');
+            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, '\t');
             string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-project.txt");
 
             Assert.Equal(expectedOutput, output);
@@ -111,7 +112,7 @@ namespace jr.common.tests
         public void GenerateSeparatedValueTextOutput_GroupByIssue_Test()
         {
             List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByIssue();
-            string output = TimeSummarization.GenerateSeparatedValueTextOutput(strOutput, '\t');
+            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, '\t');
             string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-issue.txt");
 
             Assert.Equal(expectedOutput, output);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using jr.common.Jira.Models;
+using jr.common.Models;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;

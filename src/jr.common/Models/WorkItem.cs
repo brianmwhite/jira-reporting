@@ -1,4 +1,4 @@
-namespace jr.common
+namespace jr.common.Models
 {
     public class WorkItem
     {

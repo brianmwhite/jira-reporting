@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using BetterConsoleTables;
 using FluentDateTime;
+using jr.common.Models;
 
 namespace jr.common
 {
@@ -37,14 +38,7 @@ namespace jr.common
                 : outputColumns;
         }
 
-        public enum OutputFormat
-        {
-            Csv,
-            Tab,
-            Pretty
-        }
-        
-        public string GenerateSummaryText(IEnumerable<WorkItem> workItems, OutputFormat format)
+        public string GenerateSummaryText(IEnumerable<WorkItem> workItems, OutputUtils.OutputFormat format)
         {
             var si = SummarizeWorkItems(workItems);
             si.Add(AddSummarizedTotal(si));
@@ -52,75 +46,19 @@ namespace jr.common
             string output;
             switch (format)
             {
-                case OutputFormat.Csv:
-                    output = GenerateSeparatedValueTextOutput(dataTable, ',');
+                case OutputUtils.OutputFormat.Csv:
+                    output = OutputUtils.GenerateSeparatedValueTextOutput(dataTable, ',');
                     break;
-                case OutputFormat.Tab:
-                    output = GenerateSeparatedValueTextOutput(dataTable, '\t');
+                case OutputUtils.OutputFormat.Tab:
+                    output = OutputUtils.GenerateSeparatedValueTextOutput(dataTable, '\t');
                     break;
                 default:
-                    output = GeneratePrettyOutput(dataTable);
+                    output = OutputUtils.GeneratePrettyOutput(dataTable);
                     break;
             }
             return output;
         }
 
-        public static string GeneratePrettyOutput(List<string[]> dataTable)
-        {
-            var table = new Table();
-            
-            var header = dataTable[0];
-            table.AddColumns(header);
-            
-            //remove header row
-            dataTable.RemoveAt(0);
-            table.AddRows(dataTable);
-            
-            return table.ToString();
-        }
-        
-        public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString)
-        {
-            string datestart;
-            string dateend;
-            switch (timePeriodString)
-            {
-                case "ytd":
-                    datestart = DateTime.Now.FirstDayOfYear()
-                        .ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
-                    break;
-                case "month":
-                    datestart = DateTime.Now.FirstDayOfMonth()
-                        .ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
-                    break;
-                case "lastmonth":
-                    datestart = DateTime.Now.PreviousMonth()
-                        .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.PreviousMonth()
-                        .LastDayOfMonth().ToString("yyyy-MM-dd");
-                    break;
-                case "week":
-                    datestart = DateTime.Now.FirstDayOfWeek()
-                        .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
-                    break;
-                case "lastweek":
-                    datestart = DateTime.Now.WeekEarlier()
-                        .FirstDayOfWeek().ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.WeekEarlier()
-                        .LastDayOfWeek().ToString("yyyy-MM-dd");
-                    break;
-                default:
-                    datestart = DateTime.Now.FirstDayOfMonth()
-                        .ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
-                    break;
-            }
-            return (datestart, dateend);
-        }
-        
         public List<SummarizedItem> SummarizeWorkItems(IEnumerable<WorkItem> workItems)
         {
             var summarizedWorkItems = workItems
@@ -243,21 +181,5 @@ namespace jr.common
             }
             return dataTable;
         }
-
-        public static string GenerateSeparatedValueTextOutput(IEnumerable<string[]> dataTable, char fieldSeparator)
-        {
-            var output = new StringBuilder();
-            foreach (var t in dataTable)
-            {
-                var newList = string
-                    .Join(fieldSeparator, t
-                    .Select(x => string.Format("\"{0}\"", x))
-                    .ToList());
-                output.AppendLine(newList);
-            }
-            return output.ToString();
-        }
-
-        //TODO: generate excel output?
     }
 }
