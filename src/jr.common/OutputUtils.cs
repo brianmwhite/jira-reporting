@@ -84,5 +84,24 @@ namespace jr.common
             }
             return (datestart, dateend);
         }
+
+        public static string CreateOutputString(OutputFormat format, List<string[]> dataTable)
+        {
+            string output;
+            switch (format)
+            {
+                case OutputFormat.Csv:
+                    output = GenerateSeparatedValueTextOutput(dataTable, ',');
+                    break;
+                case OutputFormat.Tab:
+                    output = GenerateSeparatedValueTextOutput(dataTable, '\t');
+                    break;
+                case OutputFormat.Pretty:
+                default:
+                    output = GeneratePrettyOutput(dataTable);
+                    break;
+            }
+            return output;
+        }
     }
 }

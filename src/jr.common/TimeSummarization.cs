@@ -43,20 +43,7 @@ namespace jr.common
             var si = SummarizeWorkItems(workItems);
             si.Add(AddSummarizedTotal(si));
             List<string[]> dataTable = GenerateOutputData(si);
-            string output;
-            switch (format)
-            {
-                case OutputUtils.OutputFormat.Csv:
-                    output = OutputUtils.GenerateSeparatedValueTextOutput(dataTable, ',');
-                    break;
-                case OutputUtils.OutputFormat.Tab:
-                    output = OutputUtils.GenerateSeparatedValueTextOutput(dataTable, '\t');
-                    break;
-                default:
-                    output = OutputUtils.GeneratePrettyOutput(dataTable);
-                    break;
-            }
-            return output;
+            return OutputUtils.CreateOutputString(format, dataTable);
         }
 
         public List<SummarizedItem> SummarizeWorkItems(IEnumerable<WorkItem> workItems)
@@ -94,6 +81,7 @@ namespace jr.common
             {
                 case HourType.Manager:
                     return _mgmtUsers.Contains(item.userName) ? item.billedHours : 0;
+                case HourType.Developer:
                 default:
                     return !_mgmtUsers.Contains(item.userName) ? item.billedHours : 0;
             }
