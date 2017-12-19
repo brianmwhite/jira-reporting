@@ -27,127 +27,101 @@ namespace jr
             app.HelpOption();
 
             app.OnExecute(() => 0);
-
-            app.Command("login", Login, false);
-            
-            //TODO: try refactoring timesummary and login to named method
-            
-            app.Command("timesummary", (command) =>
-                {
-                    Options userOptions;
-
-                    var optionSrcOption = command.Option("-s|--src <SRC>"
-                        , "Source option: web [default], excel",
-                        CommandOptionType.SingleValue);
-                    
-                    var optionConfigFileLocation = command.Option("-c|--config <CONFIG_FILE>",
-                        "Configuration file location"
-                        , CommandOptionType.SingleValue);
-                    
-                    var optionInputSource = command.Option("-i|--input <INPUT_FILE>"
-                        , "Input file location",
-                        CommandOptionType.SingleValue);
-                    
-                    var optionTimePeriod = command.Option("-t|--timeperiod <TIME_PERIOD>",
-                        "Time period: lastmonth, month, ytd"
-                        , CommandOptionType.SingleValue);
-                    
-                    var optionAccount = command.Option("-a|--account <ACCOUNT>", "Account key",
-                        CommandOptionType.SingleValue);
-                    
-                    var optionDateRange = command.Option("-d|--daterange <dates>", "Date Range",
-                        CommandOptionType.MultipleValue);
-
-                    var optionGroupBy = command.Option("-g|--groupby <groupby>", "Group by <project>, <issue>",
-                        CommandOptionType.SingleValue);
-
-                    var optionSeparatorOutput = command.Option("-o|--output <output>", "csv,tab,pretty"
-                        , CommandOptionType.SingleValue);
-
-                    command.OnExecute(() =>
-                    {
-                        userOptions = GetUserOptions(optionConfigFileLocation);
-
-                        if (optionSrcOption.HasValue())
-                        {
-                            string src = optionSrcOption.Value();
-                            switch (src)
-                            {
-                                case "web":
-                                    
-                                    //TODO: check for local credentials first
-                                    
-                                    var jc = LocalProfileInfo.LoadJiraCredentials();
-                                    var ti = new TempoInput(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
-
-                                    //TODO: parse/catch invalid date strings
-                                    
-                                    if (optionDateRange.HasValue())
-                                    {
-                                        userOptions.Filtering.DateStart = optionDateRange.Values[0];
-                                        userOptions.Filtering.DateEnd = optionDateRange.Values[1];
-                                    }
-                                    else if (optionTimePeriod.HasValue())
-                                    {
-                                        (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) 
-                                            = OutputUtils.GetTimePeriodOption(optionTimePeriod.Value());
-                                    }
-                                    if (optionAccount.HasValue())
-                                    {
-                                        userOptions.Filtering.Account = optionAccount.Value();
-                                    }
-                                    
-                                    if (optionGroupBy.HasValue())
-                                    {
-                                        string groupString = optionGroupBy.Value().ToLower();
-                                        if (groupString == "project" || groupString == "issue")
-                                        {
-                                            userOptions.Filtering.Groupby = groupString;
-                                        }
-                                        else
-                                        {
-                                            userOptions.Filtering.Groupby = "project";
-                                        }
-                                    }
-                                    if (optionSeparatorOutput.HasValue())
-                                    {
-                                        userOptions.Output.Separator = optionSeparatorOutput.Value();
-                                    }
-                                    
-                                    bool getParentIssue = userOptions.Filtering.Groupby == "issue";
-                                    
-                                    var wi = ti.GetWorkItems(
-                                        userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd, 
-                                        userOptions.Filtering.Account, getParentIssue);
-
-                                    var tempoOutput = GenerateSummaryText(userOptions, wi);
-                                    Console.WriteLine(tempoOutput);
-
-                                    break;
-                                case "excel":
-                                    //excel
-                                    if (optionInputSource.HasValue())
-                                    {
-                                        string inputSourceLocation = optionInputSource.Value();
-                                        //check to see if the input file exists
-                                        if (!string.IsNullOrEmpty(inputSourceLocation) &&
-                                            !File.Exists(inputSourceLocation))
-                                        {
-                                            Console.Error.WriteLine(string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
-                                        }
-
-                                        var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
-                                        var output = GenerateSummaryText(userOptions, workItems);
-                                        Console.WriteLine(output);
-                                    }
-                                    break;
-                            }
-                        }
-                    });
-                }
-                , false);
+            app.Command("login", Command_Login, false);
+            app.Command("timesummary", Command_TimeSummary, false);
 
             return app.Execute(args);
+        }
+
+        private static void Command_TimeSummary(CommandLineApplication command)
+        {
+            Options userOptions;
+
+            var optionSrcOption = command.Option("-s|--src <SRC>", "Source option: web [default], excel", CommandOptionType.SingleValue);
+            var optionConfigFileLocation = command.Option("-c|--config <CONFIG_FILE>", "Configuration file location", CommandOptionType.SingleValue);
+            var optionInputSource = command.Option("-i|--input <INPUT_FILE>", "Input file location", CommandOptionType.SingleValue);
+            var optionTimePeriod = command.Option("-t|--timeperiod <TIME_PERIOD>", "Time period: lastmonth, month, ytd", CommandOptionType.SingleValue);
+            var optionAccount = command.Option("-a|--account <ACCOUNT>", "Account key", CommandOptionType.SingleValue);
+            var optionDateRange = command.Option("-d|--daterange <dates>", "Date Range", CommandOptionType.MultipleValue);
+            var optionGroupBy = command.Option("-g|--groupby <groupby>", "Group by <project>, <issue>", CommandOptionType.SingleValue);
+            var optionSeparatorOutput = command.Option("-o|--output <output>", "csv,tab,pretty", CommandOptionType.SingleValue);
+
+            command.OnExecute(() =>
+            {
+                userOptions = GetUserOptions(optionConfigFileLocation);
+
+                if (optionSrcOption.HasValue())
+                {
+                    string src = optionSrcOption.Value();
+                    switch (src)
+                    {
+                        case "web":
+
+                            //TODO: check for local credentials first
+
+                            var jc = LocalProfileInfo.LoadJiraCredentials();
+                            var ti = new TempoInput(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+
+                            //TODO: parse/catch invalid date strings
+
+                            if (optionDateRange.HasValue())
+                            {
+                                userOptions.Filtering.DateStart = optionDateRange.Values[0];
+                                userOptions.Filtering.DateEnd = optionDateRange.Values[1];
+                            }
+                            else if (optionTimePeriod.HasValue())
+                            {
+                                (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) = OutputUtils.GetTimePeriodOption(optionTimePeriod.Value());
+                            }
+                            if (optionAccount.HasValue())
+                            {
+                                userOptions.Filtering.Account = optionAccount.Value();
+                            }
+
+                            if (optionGroupBy.HasValue())
+                            {
+                                string groupString = optionGroupBy.Value().ToLower();
+                                if (groupString == "project" || groupString == "issue")
+                                {
+                                    userOptions.Filtering.Groupby = groupString;
+                                }
+                                else
+                                {
+                                    userOptions.Filtering.Groupby = "project";
+                                }
+                            }
+                            if (optionSeparatorOutput.HasValue())
+                            {
+                                userOptions.Output.Separator = optionSeparatorOutput.Value();
+                            }
+
+                            bool getParentIssue = userOptions.Filtering.Groupby == "issue";
+
+                            var wi = ti.GetWorkItems(userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd, userOptions.Filtering.Account, getParentIssue);
+
+                            var tempoOutput = GenerateTimeSummaryText(userOptions, wi);
+                            Console.WriteLine(tempoOutput);
+
+                            break;
+                        case "excel":
+                            //excel
+                            if (optionInputSource.HasValue())
+                            {
+                                string inputSourceLocation = optionInputSource.Value();
+                                //check to see if the input file exists
+                                if (!string.IsNullOrEmpty(inputSourceLocation) && !File.Exists(inputSourceLocation))
+                                {
+                                    Console.Error.WriteLine(string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
+                                }
+
+                                var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
+                                var output = GenerateTimeSummaryText(userOptions, workItems);
+                                Console.WriteLine(output);
+                            }
+                            break;
+                    }
+                }
+            });
         }
 
         private static Options GetUserOptions(CommandOption optionConfigFileLocation)
@@ -177,7 +151,7 @@ namespace jr
             return userOptions;
         }
 
-        private static void Login(CommandLineApplication command)
+        private static void Command_Login(CommandLineApplication command)
         {
             //TODO: test login before saving
             
@@ -206,7 +180,7 @@ namespace jr
             });
         }
 
-        private static string GenerateSummaryText(Options userOptions, IEnumerable<WorkItem> workItems)
+        private static string GenerateTimeSummaryText(Options userOptions, IEnumerable<WorkItem> workItems)
         {
             var ts = new TimeSummarization(
                 userOptions.BillingSetup.DevRate
