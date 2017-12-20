@@ -103,5 +103,24 @@ namespace jr.common
             }
             return output;
         }
+
+        public static OutputFormat ConvertOutputFormat(string formatString)
+        {
+            OutputFormat outputformat;
+            switch (formatString.ToLower())
+            {
+                case "csv":
+                    outputformat = OutputFormat.Csv;
+                    break;
+                case "tab":
+                    outputformat = OutputFormat.Tab;
+                    break;
+                case "pretty":
+                default:
+                    outputformat = OutputFormat.Pretty;
+                    break;
+            }
+            return outputformat;
+        }
     }
 }

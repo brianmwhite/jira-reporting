@@ -43,14 +43,17 @@ namespace jr
         [JsonProperty("sort")]
         public string Sort { get; set; }
 
-        [JsonProperty("separator")]
-        public string Separator { get; set; } = string.Empty;
+        [JsonProperty("format")]
+        public string Format { get; set; } = string.Empty;
     }
 
     public class Filtering
     {
         [JsonProperty("account")]
         public string Account { get; set; }
+        
+        [JsonProperty("project")]
+        public string Project { get; set; }
 
         [JsonProperty("date_end")]
         public string DateEnd { get; set; }

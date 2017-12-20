@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using FluentDateTime;
 using McMaster.Extensions.CommandLineUtils;
 using jr.common;
 using jr.common.Excel;
 using jr.common.Jira;
 using jr.common.Models;
 using Newtonsoft.Json;
+using static jr.common.OutputUtils;
 
 //quicktype -o Options.cs --namespace "jr" sample.json
 
@@ -24,16 +24,51 @@ namespace jr
 
             //TODO: show help if no commands are specified
             
+            //TODO: refactor to new attribute style (2.1)
+            
             app.HelpOption();
 
             app.OnExecute(() => 0);
             app.Command("login", Command_Login, false);
-            app.Command("timesummary", Command_TimeSummary, false);
+            app.Command("tempo", Command_Tempo, false);
+            app.Command("jira", Command_Jira, false);
 
             return app.Execute(args);
         }
 
-        private static void Command_TimeSummary(CommandLineApplication command)
+        private static void Command_Jira(CommandLineApplication command)
+        {
+            Options userOptions;
+            var optionConfigFileLocation = command.Option("-c|--config <CONFIG_FILE>", "Configuration file location", CommandOptionType.SingleValue);
+            var optionProjectKey = command.Option("-p|--project <PROJECT>", "Jira Project Key", CommandOptionType.SingleValue);
+            var optionOutputFormat = command.Option("-o|--output <output>", "csv,tab,pretty", CommandOptionType.SingleValue);
+            
+            command.OnExecute(() =>
+                {
+                    userOptions = GetUserOptions(optionConfigFileLocation);
+                    var credentials = LocalProfileInfo.LoadJiraCredentials();
+                    var jira = new JiraApi(credentials.JiraURL, credentials.JiraUser, credentials.JiraPassword);
+                    
+                    if (optionOutputFormat.HasValue())
+                    {
+                        userOptions.Output.Format = optionOutputFormat.Value();
+                    }
+
+                    if (optionProjectKey.HasValue())
+                    {
+                        userOptions.Filtering.Project = optionProjectKey.Value();
+                    }
+
+                    var jiraItems = jira.GetItems(userOptions.Filtering.Project);
+                    var outputformat = ConvertOutputFormat(userOptions.Output.Format);
+                    string output = JiraIssueExport.GenerateSummaryText(jiraItems, outputformat);
+                    Console.WriteLine(output);
+                }
+            );
+
+        }
+
+        private static void Command_Tempo(CommandLineApplication command)
         {
             Options userOptions;
 
@@ -44,7 +79,7 @@ namespace jr
             var optionAccount = command.Option("-a|--account <ACCOUNT>", "Account key", CommandOptionType.SingleValue);
             var optionDateRange = command.Option("-d|--daterange <dates>", "Date Range", CommandOptionType.MultipleValue);
             var optionGroupBy = command.Option("-g|--groupby <groupby>", "Group by <project>, <issue>", CommandOptionType.SingleValue);
-            var optionSeparatorOutput = command.Option("-o|--output <output>", "csv,tab,pretty", CommandOptionType.SingleValue);
+            var optionOutputFormat = command.Option("-o|--output <output>", "csv,tab,pretty", CommandOptionType.SingleValue);
 
             command.OnExecute(() =>
             {
@@ -71,7 +106,7 @@ namespace jr
                             }
                             else if (optionTimePeriod.HasValue())
                             {
-                                (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) = OutputUtils.GetTimePeriodOption(optionTimePeriod.Value());
+                                (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) = GetTimePeriodOption(optionTimePeriod.Value());
                             }
                             if (optionAccount.HasValue())
                             {
@@ -90,9 +125,9 @@ namespace jr
                                     userOptions.Filtering.Groupby = "project";
                                 }
                             }
-                            if (optionSeparatorOutput.HasValue())
+                            if (optionOutputFormat.HasValue())
                             {
-                                userOptions.Output.Separator = optionSeparatorOutput.Value();
+                                userOptions.Output.Format = optionOutputFormat.Value();
                             }
 
                             bool getParentIssue = userOptions.Filtering.Groupby == "issue";
@@ -159,6 +194,7 @@ namespace jr
             command.HelpOption();
             command.OnExecute(() =>
             {
+                //TODO: refactor to use Prompt.GetPassword
                 Console.WriteLine("-- Enter Jira login info ---");
                 Console.Write("jira url (https://companyname.atlassian.net): ");
                 var url = Console.ReadLine();
@@ -192,16 +228,7 @@ namespace jr
                 , userOptions.Filtering.Groupby
             );
 
-            var outputformat = OutputUtils.OutputFormat.Pretty;
-            switch (userOptions.Output.Separator.ToLower())
-            {
-                case "csv":
-                    outputformat = OutputUtils.OutputFormat.Csv;
-                    break;
-                case "tab":
-                    outputformat = OutputUtils.OutputFormat.Tab;
-                    break;
-            }
+            var outputformat = ConvertOutputFormat(userOptions.Output.Format);
             return ts.GenerateSummaryText(workItems, outputformat);
         }
     }
