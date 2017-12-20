@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using BetterConsoleTables;
 using FluentDateTime;
@@ -19,6 +20,7 @@ namespace jr.common
         public static string GeneratePrettyOutput(List<string[]> dataTable)
         {
             var table = new Table();
+            table.Config = TableConfiguration.Markdown();
             
             var header = dataTable[0];
             table.AddColumns(header);
