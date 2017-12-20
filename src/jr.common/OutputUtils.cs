@@ -37,7 +37,7 @@ namespace jr.common
             foreach (var t in dataTable)
             {
                 var newList = String.Join(fieldSeparator, t
-                        .Select(x => String.Format("\"{0}\"", x))
+                        .Select(x => string.Format("\"{0}\"", x))
                         .ToList());
                 output.AppendLine(newList);
             }
