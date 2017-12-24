@@ -1,0 +1,22 @@
+image: Visual Studio 2017
+init:
+  - cmd: git config --global core.autocrlf true
+before_build:
+  - dotnet restore src/jr.common/jr.common.csproj
+  - dotnet restore src/jr/jr.csproj
+  - dotnet restore test/jr.common.tests/jr.common.tests.csproj
+  - choco install opencover.portable
+  - choco install codecov
+build_script:
+  - dotnet build src/jr.common/jr.common.csproj
+  - dotnet build src/jr/jr.csproj
+  - dotnet build test/jr.common.tests/jr.common.tests.csproj
+  - dotnet test test/jr.common.tests/jr.common.tests.csproj
+test_script:
+  - >-
+    OpenCover.Console.exe -register:user
+    -target:"C:/Program Files/dotnet/dotnet.exe"
+    -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full .\jira\test\jr.common.tests\jr.common.tests.csproj
+    -noshadow" -filter:"+[jr*]* +[jr.common]* -[jr.common.tests*]*"
+    -output:".\coverage.xml"
+  - codecov -f ".\coverage.xml" -t $(codecov_token)
