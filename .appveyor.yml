@@ -19,6 +19,7 @@ test_script:
     --logger:trx;LogFileName=results.trx /p:DebugType=full
     C:\projects\jira-reporting\test\jr.common.tests\jr.common.tests.csproj"
     -filter:"+[jr*]* +[jr.common*]* -[jr.common.tests*]*"
+    -skipautoprops
     -output:".\coverage.xml"
     -oldstyle
   - codecov -f ".\coverage.xml" -t $(codecov_token)
