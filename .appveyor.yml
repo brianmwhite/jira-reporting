@@ -20,5 +20,6 @@ test_script:
     C:\projects\jira-reporting\test\jr.common.tests\jr.common.tests.csproj"
     -filter:"+[jr*]* +[jr.common*]* -[jr.common.tests*]*"
     -output:".\coverage.xml"
+    -skipautoprops
     -oldstyle
   - codecov -f ".\coverage.xml" -t $(codecov_token)
