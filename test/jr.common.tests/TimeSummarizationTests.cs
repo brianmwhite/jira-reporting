@@ -97,25 +97,5 @@ namespace jr.common.tests
             List<string[]> expectedOutput = SetupData.CreateStringArrayList_GroupByIssue();
             Assert.Equal(expectedOutput, strOutput);
         }
-
-        [Fact]
-        public void GenerateSeparatedValueTextOutput_GroupByProject_Test()
-        {
-            List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByProject();
-            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, '\t');
-            string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-project.txt");
-
-            Assert.Equal(expectedOutput, output);
-        }
-        
-        [Fact]
-        public void GenerateSeparatedValueTextOutput_GroupByIssue_Test()
-        {
-            List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByIssue();
-            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, '\t');
-            string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-issue.txt");
-
-            Assert.Equal(expectedOutput, output);
-        }
     }
 }
