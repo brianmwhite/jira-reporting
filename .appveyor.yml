@@ -18,7 +18,7 @@ test_script:
     Files/dotnet/dotnet.exe" -targetargs:"test
     --logger:trx;LogFileName=results.trx /p:DebugType=full
     C:\projects\jira-reporting\test\jr.common.tests\jr.common.tests.csproj"
-    -filter:"+[jr*]* +[jr.common*]* -[jr.common.tests*]*"
+    -filter:"+[jr.common*]* -[jr.common.tests*]* -[jr.common.Jira.Models]*"
     -output:".\coverage.xml"
     -skipautoprops
     -oldstyle
