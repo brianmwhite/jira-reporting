@@ -46,41 +46,46 @@ namespace jr.common
 
         public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString)
         {
+            return GetTimePeriodOption(timePeriodString, DateTime.Now);
+        }
+
+        public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString, DateTime today)
+        {
             string datestart;
             string dateend;
             switch (timePeriodString)
             {
                 case "ytd":
-                    datestart = DateTime.Now.FirstDayOfYear()
+                    datestart = today.FirstDayOfYear()
                         .ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    dateend = today.ToString("yyyy-MM-dd");
                     break;
                 case "month":
-                    datestart = DateTime.Now.FirstDayOfMonth()
+                    datestart = today.FirstDayOfMonth()
                         .ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    dateend = today.ToString("yyyy-MM-dd");
                     break;
                 case "lastmonth":
-                    datestart = DateTime.Now.PreviousMonth()
+                    datestart = today.PreviousMonth()
                         .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.PreviousMonth()
+                    dateend = today.PreviousMonth()
                         .LastDayOfMonth().ToString("yyyy-MM-dd");
                     break;
                 case "week":
-                    datestart = DateTime.Now.FirstDayOfWeek()
-                        .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    datestart = today.FirstDayOfWeek()
+                        .ToString("yyyy-MM-dd");
+                    dateend = today.ToString("yyyy-MM-dd");
                     break;
                 case "lastweek":
-                    datestart = DateTime.Now.WeekEarlier()
+                    datestart = today.WeekEarlier()
                         .FirstDayOfWeek().ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.WeekEarlier()
+                    dateend = today.WeekEarlier()
                         .LastDayOfWeek().ToString("yyyy-MM-dd");
                     break;
                 default:
-                    datestart = DateTime.Now.FirstDayOfMonth()
+                    datestart = today.FirstDayOfMonth()
                         .ToString("yyyy-MM-dd");
-                    dateend = DateTime.Now.ToString("yyyy-MM-dd");
+                    dateend = today.ToString("yyyy-MM-dd");
                     break;
             }
             return (datestart, dateend);
