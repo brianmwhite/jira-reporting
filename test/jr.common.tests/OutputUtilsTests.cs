@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xunit;
+using static jr.common.OutputUtils;
 
 namespace jr.common.tests
 {
@@ -10,7 +11,7 @@ namespace jr.common.tests
         public void GenerateSeparatedValueTextOutput_GroupByProject_Test()
         {
             List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByProject();
-            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, '\t');
+            string output = GenerateSeparatedValueTextOutput(strOutput, '\t');
             string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-project.txt");
 
             Assert.Equal(expectedOutput, output);
@@ -20,7 +21,7 @@ namespace jr.common.tests
         public void GenerateSeparatedValueTextOutput_GroupByIssue_Test()
         {
             List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByIssue();
-            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, '\t');
+            string output = GenerateSeparatedValueTextOutput(strOutput, '\t');
             string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-issue.txt");
 
             Assert.Equal(expectedOutput, output);
@@ -46,7 +47,7 @@ namespace jr.common.tests
         public void GetTimePeriodOption_YTD_Test()
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("ytd", today);
+            (string startDate, string endDate) = GetTimePeriodOption("ytd", today);
             Assert.Equal("2017-01-01", startDate);
             Assert.Equal("2017-12-26", endDate);
         }
@@ -55,7 +56,7 @@ namespace jr.common.tests
         public void GetTimePeriodOption_MONTH_Test()
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("month", today);
+            (string startDate, string endDate) = GetTimePeriodOption("month", today);
             Assert.Equal("2017-12-01", startDate);
             Assert.Equal("2017-12-26", endDate);
         }
@@ -64,7 +65,7 @@ namespace jr.common.tests
         public void GetTimePeriodOption_LASTMONTH_Test()
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("lastmonth", today);
+            (string startDate, string endDate) = GetTimePeriodOption("lastmonth", today);
             Assert.Equal("2017-11-01", startDate);
             Assert.Equal("2017-11-30", endDate);
         }
@@ -73,7 +74,7 @@ namespace jr.common.tests
         public void GetTimePeriodOption_WEEK_Test()
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("week", today);
+            (string startDate, string endDate) = GetTimePeriodOption("week", today);
             Assert.Equal("2017-12-24", startDate);
             Assert.Equal("2017-12-26", endDate);
         }
@@ -82,7 +83,7 @@ namespace jr.common.tests
         public void GetTimePeriodOption_LASTWEEK_Test()
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("lastweek", today);
+            (string startDate, string endDate) = GetTimePeriodOption("lastweek", today);
             Assert.Equal("2017-12-17", startDate);
             Assert.Equal("2017-12-23", endDate);
         }
@@ -91,11 +92,18 @@ namespace jr.common.tests
         public void GetTimePeriodOption_GIBBERISH_Test()
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("gibberish", today);
+            (string startDate, string endDate) = GetTimePeriodOption("gibberish", today);
             Assert.Equal("2017-12-01", startDate);
             Assert.Equal("2017-12-26", endDate);
         }
-        
-        
+
+        [Fact]
+        public void ConvertOutputFormatTest()
+        {
+            Assert.Equal(OutputFormat.Csv, ConvertOutputFormat("csv"));
+            Assert.Equal(OutputFormat.Tab, ConvertOutputFormat("tab"));
+            Assert.Equal(OutputFormat.Pretty, ConvertOutputFormat("pretty"));
+            Assert.Equal(OutputFormat.Pretty, ConvertOutputFormat("gibberish"));
+        }
     }
 }

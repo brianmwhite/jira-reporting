@@ -87,7 +87,7 @@ namespace jr.common
             }
         }
 
-        private SummarizedItem AddSummarizedTotal(IReadOnlyCollection<SummarizedItem> summarizedWorkItems)
+        public SummarizedItem AddSummarizedTotal(IReadOnlyCollection<SummarizedItem> summarizedWorkItems)
         {
             var totalRow = new SummarizedItem()
             {

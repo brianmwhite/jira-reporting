@@ -97,5 +97,35 @@ namespace jr.common.tests
             List<string[]> expectedOutput = SetupData.CreateStringArrayList_GroupByIssue();
             Assert.Equal(expectedOutput, strOutput);
         }
+
+        [Fact]
+        public void AddSummarizedTotalTest()
+        {
+            var ts = new TimeSummarization(10,20,null,false,string.Empty);
+            var rows = new List<SummarizedItem>
+            {
+                new SummarizedItem {project = "project name", dev_hours = 100, mgmt_hours = 5, issue = string.Empty},
+                new SummarizedItem {project = "project name", dev_hours = 200, mgmt_hours = 10, issue = string.Empty},
+                new SummarizedItem {project = "project name", dev_hours = 50, mgmt_hours = 40, issue = string.Empty},
+                new SummarizedItem {project = "project name", dev_hours = 350, mgmt_hours = 25, issue = string.Empty},
+                new SummarizedItem {project = "project name", dev_hours = 300, mgmt_hours = 20, issue = string.Empty}
+            };
+
+            var totalRow = ts.AddSummarizedTotal(rows);
+            var expectedTotalRow = new SummarizedItem
+            {
+                project = "project name",
+                dev_hours = 1000,
+                mgmt_hours = 100,
+                dev_rate = 10,
+                mgmt_rate = 20,
+                issue = string.Empty
+            };
+            
+            Assert.Equal(expectedTotalRow.dev_hours, totalRow.dev_hours);
+            Assert.Equal(expectedTotalRow.dev_amount, totalRow.dev_amount);
+            Assert.Equal(expectedTotalRow.mgmt_hours, totalRow.mgmt_hours);
+            Assert.Equal(expectedTotalRow.mgmt_amount, totalRow.mgmt_amount);
+        }
     }
 }
