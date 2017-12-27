@@ -1,10 +1,10 @@
 //TODO: add isolated tests, create test data
 
-using jr.common;
 using jr.common.Jira;
 using Xunit;
+
 //
-namespace jr.common.tests
+namespace jr.common.tests.Jira
 {
     public class JiraApiTests
     {

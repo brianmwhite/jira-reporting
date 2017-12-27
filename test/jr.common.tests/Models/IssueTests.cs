@@ -1,7 +1,7 @@
 ﻿using jr.common.Models;
 using Xunit;
 
-namespace jr.common.tests
+namespace jr.common.tests.Models
 {
     public class IssueTests
     {

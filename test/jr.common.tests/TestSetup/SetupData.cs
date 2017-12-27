@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using jr.common.Models;
 
-namespace jr.common.tests
+namespace jr.common.tests.TestSetup
 {
     public static class SetupData
     {

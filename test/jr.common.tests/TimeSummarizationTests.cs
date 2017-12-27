@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Xunit;
 using System.Linq;
 using jr.common.Models;
+using jr.common.tests.TestSetup;
 
 namespace jr.common.tests
 {

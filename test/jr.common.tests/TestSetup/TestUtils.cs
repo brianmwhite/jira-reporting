@@ -2,7 +2,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace jr.common.tests
+namespace jr.common.tests.TestSetup
 {
     public static class TestUtils
     {
