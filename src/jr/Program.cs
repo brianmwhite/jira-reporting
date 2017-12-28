@@ -85,75 +85,75 @@ namespace jr
             {
                 userOptions = GetUserOptions(optionConfigFileLocation);
 
-                if (optionSrcOption.HasValue())
+                string src = optionSrcOption.HasValue() ? optionSrcOption.Value() : "web";
+
+                if (src == "web")
                 {
-                    string src = optionSrcOption.Value();
-                    switch (src)
+                    //TODO: check for local credentials first
+
+                    var jc = LocalProfileInfo.LoadJiraCredentials();
+                    var ti = new JiraApi(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+
+                    //TODO: parse/catch invalid date strings
+
+                    if (optionDateRange.HasValue())
                     {
-                        case "web":
+                        userOptions.Filtering.DateStart = optionDateRange.Values[0];
+                        userOptions.Filtering.DateEnd = optionDateRange.Values[1];
+                    }
+                    else if (optionTimePeriod.HasValue())
+                    {
+                        (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) =
+                            GetTimePeriodOption(optionTimePeriod.Value());
+                    }
 
-                            //TODO: check for local credentials first
+                    if (optionAccount.HasValue())
+                    {
+                        userOptions.Filtering.Account = optionAccount.Value();
+                    }
 
-                            var jc = LocalProfileInfo.LoadJiraCredentials();
-                            var ti = new JiraApi(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+                    if (optionGroupBy.HasValue())
+                    {
+                        string groupString = optionGroupBy.Value().ToLower();
+                        if (groupString == "project" || groupString == "issue")
+                        {
+                            userOptions.Filtering.Groupby = groupString;
+                        }
+                        else
+                        {
+                            userOptions.Filtering.Groupby = "project";
+                        }
+                    }
 
-                            //TODO: parse/catch invalid date strings
+                    if (optionOutputFormat.HasValue())
+                    {
+                        userOptions.Output.Format = optionOutputFormat.Value();
+                    }
 
-                            if (optionDateRange.HasValue())
-                            {
-                                userOptions.Filtering.DateStart = optionDateRange.Values[0];
-                                userOptions.Filtering.DateEnd = optionDateRange.Values[1];
-                            }
-                            else if (optionTimePeriod.HasValue())
-                            {
-                                (userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd) = GetTimePeriodOption(optionTimePeriod.Value());
-                            }
-                            if (optionAccount.HasValue())
-                            {
-                                userOptions.Filtering.Account = optionAccount.Value();
-                            }
+                    bool getParentIssue = userOptions.Filtering.Groupby == "issue";
 
-                            if (optionGroupBy.HasValue())
-                            {
-                                string groupString = optionGroupBy.Value().ToLower();
-                                if (groupString == "project" || groupString == "issue")
-                                {
-                                    userOptions.Filtering.Groupby = groupString;
-                                }
-                                else
-                                {
-                                    userOptions.Filtering.Groupby = "project";
-                                }
-                            }
-                            if (optionOutputFormat.HasValue())
-                            {
-                                userOptions.Output.Format = optionOutputFormat.Value();
-                            }
+                    var wi = ti.GetWorkItems(userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd,
+                        userOptions.Filtering.Account, getParentIssue);
 
-                            bool getParentIssue = userOptions.Filtering.Groupby == "issue";
+                    var tempoOutput = GenerateTimeSummaryText(userOptions, wi);
+                    Console.WriteLine(tempoOutput);
+                }
+                else if (src == "excel")
+                {
+                    //excel
+                    if (optionInputSource.HasValue())
+                    {
+                        string inputSourceLocation = optionInputSource.Value();
+                        //check to see if the input file exists
+                        if (!string.IsNullOrEmpty(inputSourceLocation) && !File.Exists(inputSourceLocation))
+                        {
+                            Console.Error.WriteLine(
+                                string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
+                        }
 
-                            var wi = ti.GetWorkItems(userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd, userOptions.Filtering.Account, getParentIssue);
-
-                            var tempoOutput = GenerateTimeSummaryText(userOptions, wi);
-                            Console.WriteLine(tempoOutput);
-
-                            break;
-                        case "excel":
-                            //excel
-                            if (optionInputSource.HasValue())
-                            {
-                                string inputSourceLocation = optionInputSource.Value();
-                                //check to see if the input file exists
-                                if (!string.IsNullOrEmpty(inputSourceLocation) && !File.Exists(inputSourceLocation))
-                                {
-                                    Console.Error.WriteLine(string.Format($"Input file not found: {Path.GetFullPath(inputSourceLocation)}"));
-                                }
-
-                                var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
-                                var output = GenerateTimeSummaryText(userOptions, workItems);
-                                Console.WriteLine(output);
-                            }
-                            break;
+                        var workItems = ExcelInput.ExtractWorkItemsFromExcel(inputSourceLocation);
+                        var output = GenerateTimeSummaryText(userOptions, workItems);
+                        Console.WriteLine(output);
                     }
                 }
             });
