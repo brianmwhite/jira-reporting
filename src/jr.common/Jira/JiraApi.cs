@@ -9,6 +9,8 @@ namespace jr.common.Jira
 {
     public class JiraApi
     {
+        //TODO: use repository pattern / dependency injection?
+        
         private readonly string _pwd;
         private readonly string _url;
         private readonly string _user;
