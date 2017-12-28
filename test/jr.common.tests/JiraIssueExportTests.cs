@@ -41,6 +41,7 @@ namespace jr.common.tests
             List<string[]> output = JiraIssueExport.GenerateOutputData(issues);
             var expectedOutput = new List<string[]>
             {
+                new[] {"Epic", "Issue Key", "Issue Summary", "Issue", "Issue Type", "Status", "Team", "Version", "Sprint", "Story Points"},
                 new[] {"epic", "issuekey", "issuename", "[issuekey] issuename", "issuetype", "status", "team", "version", "sprint", "3"},
                 new[] {"epic", "issuekey", "issuename", "[issuekey] issuename", "issuetype", "status", "team", "version", "sprint", "5"},
                 new[] {"epic", "issuekey", "issuename", "[issuekey] issuename", "issuetype", "status", "team", "version", "sprint", "8"},

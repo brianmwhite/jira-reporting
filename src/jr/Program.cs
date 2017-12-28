@@ -59,7 +59,7 @@ namespace jr
                         userOptions.Filtering.Project = optionProjectKey.Value();
                     }
 
-                    var jiraItems = jira.GetItems(userOptions.Filtering.Project);
+                    var jiraItems = jira.GetIssuesFromProject(userOptions.Filtering.Project);
                     var outputformat = ConvertOutputFormat(userOptions.Output.Format);
                     string output = JiraIssueExport.GenerateSummaryText(jiraItems, outputformat);
                     Console.WriteLine(output);
@@ -95,7 +95,7 @@ namespace jr
                             //TODO: check for local credentials first
 
                             var jc = LocalProfileInfo.LoadJiraCredentials();
-                            var ti = new TempoInput(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+                            var ti = new JiraApi(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
 
                             //TODO: parse/catch invalid date strings
 

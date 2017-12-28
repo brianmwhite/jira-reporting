@@ -14,13 +14,13 @@ namespace jr.common.Jira.Models
         public long Id { get; set; }
 
         [JsonProperty("issue")]
-        public Issue Issue { get; set; }
+        public TempoIssue TempoIssue { get; set; }
 
         [JsonProperty("timeSpentSeconds")]
         public long TimeSpentSeconds { get; set; }
     }
 
-    public class Issue
+    public class TempoIssue
     {
         [JsonProperty("id")]
         public long Id { get; set; }

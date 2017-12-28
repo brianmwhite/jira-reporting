@@ -12,7 +12,7 @@ namespace jr.common.tests.Jira
         public void ConvertSecondsToHoursTest()
         {
             const double expectedHours = 5.25;
-            double actualHours = JiraApi.ConvertSecondsToHours(18900);
+            double actualHours = JiraUtils.ConvertSecondsToHours(18900);
             Assert.Equal(expectedHours, actualHours);
         }
         
@@ -20,7 +20,7 @@ namespace jr.common.tests.Jira
         public void ConvertSecondsToHoursZeroTest()
         {
             const double expectedHours = 0;
-            double actualHours = JiraApi.ConvertSecondsToHours(0);
+            double actualHours = JiraUtils.ConvertSecondsToHours(0);
             Assert.Equal(expectedHours, actualHours);
         }
         
@@ -28,7 +28,7 @@ namespace jr.common.tests.Jira
         public void ConvertSecondsToHoursNegativeTest()
         {
             const double expectedHours = 0;
-            double actualHours = JiraApi.ConvertSecondsToHours(-1000);
+            double actualHours = JiraUtils.ConvertSecondsToHours(-1000);
             Assert.Equal(expectedHours, actualHours);
         }
 
@@ -36,7 +36,7 @@ namespace jr.common.tests.Jira
         public void ExtractSprintNameTest()
         {
             const string sprintString = "com.atlassian.greenhopper.service.sprint.Sprint@215201cd[id=348,rapidViewId=176,state=CLOSED,name=Sprint 15,goal=<null>,startDate=2016-04-18T14:40:01.457Z,endDate=2016-04-29T14:40:00.000Z,completeDate=2016-04-29T14:52:52.537Z,sequence=341]";
-            string sprintName = JiraApi.ExtractSprintName(sprintString);
+            string sprintName = JiraUtils.ExtractSprintName(sprintString);
             Assert.Equal("Sprint 15", sprintName);
         }
         
@@ -44,7 +44,7 @@ namespace jr.common.tests.Jira
         public void ExtractSprintNameEmptyTest()
         {
             const string sprintString = "";
-            string sprintName = JiraApi.ExtractSprintName(sprintString);
+            string sprintName = JiraUtils.ExtractSprintName(sprintString);
             Assert.Equal("", sprintName);
         }
 
@@ -115,7 +115,7 @@ namespace jr.common.tests.Jira
             const int total = 64;
             const int maxResults = 50;
             
-            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+            var pages = JiraUtils.GetPagingStartPageNumbers(total, maxResults);
 
             int[] expectedPages = {50};
             Assert.Equal(expectedPages, pages);
@@ -127,7 +127,7 @@ namespace jr.common.tests.Jira
             const int total = 1203;
             const int maxResults = 50;
             
-            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+            var pages = JiraUtils.GetPagingStartPageNumbers(total, maxResults);
 
             int[] expectedPages = {50,100,150,200,250,300,350,400,450,500,550,600,650
                                    ,700,750,800,850,900,950,1000,1050,1100,1150,1200};
@@ -140,7 +140,7 @@ namespace jr.common.tests.Jira
             const int total = 32;
             const int maxResults = 50;
             
-            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+            var pages = JiraUtils.GetPagingStartPageNumbers(total, maxResults);
 
             int[] expectedPages = {};
             Assert.Equal(expectedPages, pages);
@@ -152,7 +152,7 @@ namespace jr.common.tests.Jira
             const int total = 50;
             const int maxResults = 50;
             
-            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+            var pages = JiraUtils.GetPagingStartPageNumbers(total, maxResults);
 
             int[] expectedPages = {};
             Assert.Equal(expectedPages, pages);
@@ -164,7 +164,7 @@ namespace jr.common.tests.Jira
             const int total = 150;
             const int maxResults = 50;
             
-            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+            var pages = JiraUtils.GetPagingStartPageNumbers(total, maxResults);
 
             int[] expectedPages = {50,100};
             Assert.Equal(expectedPages, pages);
@@ -176,7 +176,7 @@ namespace jr.common.tests.Jira
             const int total = 0;
             const int maxResults = 50;
             
-            var pages = JiraApi.GetPagingStartPageNumbers(total, maxResults);
+            var pages = JiraUtils.GetPagingStartPageNumbers(total, maxResults);
 
             int[] expectedPages = {};
             Assert.Equal(expectedPages, pages);
