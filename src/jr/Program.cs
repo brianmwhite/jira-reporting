@@ -47,7 +47,8 @@ namespace jr
                 {
                     userOptions = GetUserOptions(optionConfigFileLocation);
                     var credentials = LocalProfileInfo.LoadJiraCredentials();
-                    var jira = new JiraApi(credentials.JiraURL, credentials.JiraUser, credentials.JiraPassword);
+                    var jiraApi = new JiraApi(credentials.JiraURL, credentials.JiraUser, credentials.JiraPassword);
+                    var jiraSerices = new JiraServices(jiraApi);
                     
                     if (optionOutputFormat.HasValue())
                     {
@@ -59,7 +60,7 @@ namespace jr
                         userOptions.Filtering.Project = optionProjectKey.Value();
                     }
 
-                    var jiraItems = jira.GetIssuesFromProject(userOptions.Filtering.Project);
+                    var jiraItems = jiraSerices.GetIssuesFromProject(userOptions.Filtering.Project);
                     var outputformat = ConvertOutputFormat(userOptions.Output.Format);
                     string output = JiraIssueExport.GenerateSummaryText(jiraItems, outputformat);
                     Console.WriteLine(output);
@@ -92,7 +93,8 @@ namespace jr
                     //TODO: check for local credentials first
 
                     var jc = LocalProfileInfo.LoadJiraCredentials();
-                    var ti = new JiraApi(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+                    var jiraApi = new JiraApi(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+                    var jiraServices = new JiraServices(jiraApi);
 
                     //TODO: parse/catch invalid date strings
 
@@ -132,7 +134,7 @@ namespace jr
 
                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
 
-                    var wi = ti.GetWorkItems(userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd,
+                    var wi = jiraServices.GetWorkItems(userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd,
                         userOptions.Filtering.Account, getParentIssue);
 
                     var tempoOutput = GenerateTimeSummaryText(userOptions, wi);

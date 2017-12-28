@@ -1,16 +1,23 @@
 ﻿using System.Collections.Generic;
 using jr.common.Jira.Models;
-using jr.common.Models;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 
 namespace jr.common.Jira
 {
-    public class JiraApi
+    public interface IJiraApi
+    {
+        JiraIssue GetJiraIssue(long issueId);
+        JiraProject GetJiraProject(long projectId);
+        IEnumerable<JiraIssueResults> GetJiraIssuesFromProject(string project);
+        IEnumerable<TempoWorkItem> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey);
+    }
+
+    public class JiraApi : IJiraApi
     {
         //TODO: use repository pattern / dependency injection?
-        
+
         private readonly string _pwd;
         private readonly string _url;
         private readonly string _user;
@@ -22,7 +29,7 @@ namespace jr.common.Jira
             _url = url;
         }
 
-        private JiraIssue GetJiraIssue(long issueId)
+        public JiraIssue GetJiraIssue(long issueId)
         {
             var client = new RestClient(_url + "/rest/api/2")
             {
@@ -45,7 +52,7 @@ namespace jr.common.Jira
             );
         }
 
-        private JiraProject GetJiraProject(long projectId)
+        public JiraProject GetJiraProject(long projectId)
         {
             var client = new RestClient(_url + "/rest/api/2/")
             {
@@ -66,30 +73,28 @@ namespace jr.common.Jira
             );
         }
 
-        private IEnumerable<JiraIssueResults> GetJiraIssuesFromProject(string project)
+        public IEnumerable<JiraIssueResults> GetJiraIssuesFromProject(string project)
         {
             var resultsCollection = new List<JiraIssueResults>();
 
             string jql = $"project={project}";
-            string initialJson = GetIssueSearchResultsPaginated(jql, 0, 0);
-            JiraIssueResults firstResult = JiraUtils.DeserializeJiraIssueResults(initialJson);
+            JiraIssueResults firstResult = GetIssueSearchResultsPaginated(jql, 0, 0);
             int maxResults = firstResult.MaxResults;
 
-            var startAtPages = JiraUtils.GetPagingStartPageNumbers(firstResult.Total, maxResults);
+            var startAtPages = JiraServices.GetPagingStartPageNumbers(firstResult.Total, maxResults);
 
             resultsCollection.Add(firstResult);
 
             foreach (var item in startAtPages)
             {
-                var json = GetIssueSearchResultsPaginated(jql, item, maxResults);
-                var result = JiraUtils.DeserializeJiraIssueResults(json);
+                var result = GetIssueSearchResultsPaginated(jql, item, maxResults);
                 resultsCollection.Add(result);
             }
 
             return resultsCollection;
         }
 
-        private string GetIssueSearchResultsPaginated(string jql, int startAt, int maxResults)
+        private JiraIssueResults GetIssueSearchResultsPaginated(string jql, int startAt, int maxResults)
         {
             var client = new RestClient(_url + "/rest/api/2") {Authenticator = new HttpBasicAuthenticator(_user, _pwd)};
             var request = new RestRequest("search", Method.GET);
@@ -97,23 +102,21 @@ namespace jr.common.Jira
             request.AddParameter("fields",
                 "id,key,summary,issuetype,priority,created,fixVersions,status,customfield_10008,customfield_11600,customfield_10004");
             request.AddParameter("startAt", startAt);
-            if (maxResults > 0)
-            {
-                request.AddParameter("maxResults", maxResults);
-            }
+            if (maxResults > 0) request.AddParameter("maxResults", maxResults);
 
             var response = client.Execute(request);
-            return response.Content;
+
+            var tp = JsonConvert.DeserializeObject<JiraIssueResults>(response.Content,
+                new JsonSerializerSettings
+                {
+                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                    DateParseHandling = DateParseHandling.None
+                }
+            );
+            return tp;
         }
 
-        public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey,
-            bool getParentIssue = false)
-        {
-            var twi = GetTempoWorkItems(dateFrom, dateTo, accountKey);
-            return ConvertTempoWorkItems(twi, getParentIssue);
-        }
-
-        private IEnumerable<TempoWorkItem> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey)
+        public IEnumerable<TempoWorkItem> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey)
         {
             var client = new RestClient(_url + "/rest/tempo-timesheets/3/")
             {
@@ -138,48 +141,6 @@ namespace jr.common.Jira
             var twi = new List<TempoWorkItem>();
             twi.AddRange(arr);
             return twi;
-        }
-
-        private IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
-        {
-            var wi = new List<WorkItem>();
-            var projectLookup = new Dictionary<long, string>();
-            foreach (TempoWorkItem item in twi)
-            {
-                var w = new WorkItem
-                {
-                    issueKey = item.TempoIssue.Key,
-                    issueName = item.TempoIssue.Summary,
-                    billedHours = JiraUtils.ConvertSecondsToHours(item.BilledSeconds),
-                    userName = item.Author.Name
-                };
-
-                if (projectLookup.ContainsKey(item.TempoIssue.ProjectId))
-                {
-                    w.project = projectLookup.GetValueOrDefault(item.TempoIssue.ProjectId);
-                }
-                else
-                {
-                    string projectName = GetJiraProject(item.TempoIssue.ProjectId)?.Name ?? string.Empty;
-                    projectLookup.Add(item.TempoIssue.ProjectId, projectName);
-                    w.project = projectName;
-                }
-
-                if (getParentIssue && item.TempoIssue.IssueType.Name == "Sub-task")
-                {
-                    var ji = GetJiraIssue(item.TempoIssue.Id);
-                    (w.issueKey, w.issueName) = JiraUtils.GetParentIssueFields(ji);
-                }
-
-                wi.Add(w);
-            }
-
-            return wi;
-        }
-
-        public IEnumerable<Issue> GetIssuesFromProject(string project)
-        {
-            return JiraUtils.ConvertJiraIssueResults(GetJiraIssuesFromProject(project));
         }
     }
 }
