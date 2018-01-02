@@ -16,11 +16,9 @@ test_script:
   - >-
     OpenCover.Console.exe 
     -register:user 
-    -target:"C:/Program Files/dotnet/dotnet.exe" 
-    -targetargs:"test 
-      --logger:trx;LogFileName=results.trx 
-      /p:DebugType=full
-      C:\projects\jira-reporting\test\jr.common.tests\jr.common.tests.csproj"
+    -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test
+    --logger:trx;LogFileName=results.trx /p:DebugType=full
+    C:\projects\jira-reporting\test\jr.common.tests\jr.common.tests.csproj"
     -filter:"+[jr.common*]* -[jr.common.tests*]* -[jr.common.Jira.Models]*"
     -excludebyattribute:*.ExcludeFromCodeCoverage*
     -output:".\coverage.xml"
