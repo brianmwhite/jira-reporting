@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using jr.common.Jira.Models;
 using jr.common.Models;
-using Newtonsoft.Json;
 
 namespace jr.common.Jira
 {
@@ -15,11 +14,11 @@ namespace jr.common.Jira
 
     public class JiraServices : IJiraServices
     {
-        private IJiraApi JiraApi;
+        private readonly IJiraApi _jiraApi;
 
         public JiraServices(IJiraApi jiraApi)
         {
-            JiraApi = jiraApi;
+            _jiraApi = jiraApi;
         }
 
         public static double ConvertSecondsToHours(long seconds)
@@ -53,15 +52,15 @@ namespace jr.common.Jira
         
         public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey, bool getParentIssue = false)
         {
-            return ConvertTempoWorkItems(JiraApi.GetTempoWorkItems(dateFrom, dateTo, accountKey), getParentIssue);
+            return ConvertTempoWorkItems(_jiraApi.GetTempoWorkItems(dateFrom, dateTo, accountKey), getParentIssue);
         }
         
         public IEnumerable<Issue> GetIssuesFromProject(string project)
         {
-            return ConvertJiraIssueResults(JiraApi.GetJiraIssuesFromProject(project));
+            return ConvertJiraIssueResults(_jiraApi.GetJiraIssuesFromProject(project));
         }
         
-        private IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
+        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
         {
             var wi = new List<WorkItem>();
             var projectLookup = new Dictionary<long, string>();
@@ -71,7 +70,7 @@ namespace jr.common.Jira
                 {
                     issueKey = item.TempoIssue.Key,
                     issueName = item.TempoIssue.Summary,
-                    billedHours = JiraServices.ConvertSecondsToHours(item.BilledSeconds),
+                    billedHours = ConvertSecondsToHours(item.BilledSeconds),
                     userName = item.Author.Name
                 };
 
@@ -81,14 +80,14 @@ namespace jr.common.Jira
                 }
                 else
                 {
-                    string projectName = JiraApi.GetJiraProject(item.TempoIssue.ProjectId)?.Name ?? string.Empty;
+                    string projectName = _jiraApi.GetJiraProject(item.TempoIssue.ProjectId)?.Name ?? string.Empty;
                     projectLookup.Add(item.TempoIssue.ProjectId, projectName);
                     w.project = projectName;
                 }
 
                 if (getParentIssue && item.TempoIssue.IssueType.Name == "Sub-task")
                 {
-                    var ji = JiraApi.GetJiraIssue(item.TempoIssue.Id);
+                    var ji = _jiraApi.GetJiraIssue(item.TempoIssue.Id);
                     if (ji.Fields.Parent?.Fields != null)
                     {
                         w.issueKey = ji.Fields.Parent.Key;
@@ -102,7 +101,7 @@ namespace jr.common.Jira
             return wi;
         }
 
-        private IEnumerable<Issue> ConvertJiraIssueResults(IEnumerable<JiraIssueResults> jir) {
+        public IEnumerable<Issue> ConvertJiraIssueResults(IEnumerable<JiraIssueResults> jir) {
             var jrItems = new List<Issue>();
             foreach (var jiraResults in jir)
             {
