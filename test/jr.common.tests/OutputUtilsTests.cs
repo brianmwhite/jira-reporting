@@ -59,58 +59,19 @@ namespace jr.common.tests
 //            Assert.Equal(expectedOutput, output);
 //        }
 
-        [Fact]
-        public void GetTimePeriodOption_YTD_Test()
+        [Theory]
+        [InlineData("ytd", "2017-01-01", "2017-12-26")]
+        [InlineData("month", "2017-12-01", "2017-12-26")]
+        [InlineData("lastmonth", "2017-11-01", "2017-11-30")]
+        [InlineData("week", "2017-12-24", "2017-12-26")]
+        [InlineData("lastweek", "2017-12-17", "2017-12-23")]
+        [InlineData("gibberish", "2017-12-01", "2017-12-26")]
+        public void GetTimePeriodOption_YTD_Test(string timePeriod, string expectedStartDate, string expectedEndDate)
         {
             var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("ytd", today);
-            Assert.Equal("2017-01-01", startDate);
-            Assert.Equal("2017-12-26", endDate);
-        }
-        
-        [Fact]
-        public void GetTimePeriodOption_MONTH_Test()
-        {
-            var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("month", today);
-            Assert.Equal("2017-12-01", startDate);
-            Assert.Equal("2017-12-26", endDate);
-        }
-        
-        [Fact]
-        public void GetTimePeriodOption_LASTMONTH_Test()
-        {
-            var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("lastmonth", today);
-            Assert.Equal("2017-11-01", startDate);
-            Assert.Equal("2017-11-30", endDate);
-        }
-
-        [Fact]
-        public void GetTimePeriodOption_WEEK_Test()
-        {
-            var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("week", today);
-            Assert.Equal("2017-12-24", startDate);
-            Assert.Equal("2017-12-26", endDate);
-        }
-
-        [Fact]
-        public void GetTimePeriodOption_LASTWEEK_Test()
-        {
-            var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("lastweek", today);
-            Assert.Equal("2017-12-17", startDate);
-            Assert.Equal("2017-12-23", endDate);
-        }
-
-        [Fact]
-        public void GetTimePeriodOption_GIBBERISH_Test()
-        {
-            var today = new DateTime(2017,12,26);
-            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption("gibberish", today);
-            Assert.Equal("2017-12-01", startDate);
-            Assert.Equal("2017-12-26", endDate);
+            (string startDate, string endDate) = OutputUtils.GetTimePeriodOption(timePeriod, today);
+            Assert.Equal(expectedStartDate, startDate);
+            Assert.Equal(expectedEndDate, endDate);
         }
 
         [Fact]
