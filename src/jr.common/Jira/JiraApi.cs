@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using jr.common.Jira.Models;
 using Newtonsoft.Json;
 using RestSharp;
@@ -22,13 +23,15 @@ namespace jr.common.Jira
         private readonly string _url;
         private readonly string _user;
 
+        [ExcludeFromCodeCoverage]
         public JiraApi(string url, string user, string pwd)
         {
             _pwd = pwd;
             _user = user;
             _url = url;
         }
-
+        
+        [ExcludeFromCodeCoverage]
         public JiraIssue GetJiraIssue(long issueId)
         {
             var client = new RestClient(_url + "/rest/api/2")
@@ -51,7 +54,8 @@ namespace jr.common.Jira
                 }
             );
         }
-
+        
+        [ExcludeFromCodeCoverage]
         public JiraProject GetJiraProject(long projectId)
         {
             var client = new RestClient(_url + "/rest/api/2/")
@@ -73,6 +77,7 @@ namespace jr.common.Jira
             );
         }
 
+        [ExcludeFromCodeCoverage]
         public IEnumerable<JiraIssueResults> GetJiraIssuesFromProject(string project)
         {
             var resultsCollection = new List<JiraIssueResults>();
@@ -94,6 +99,7 @@ namespace jr.common.Jira
             return resultsCollection;
         }
 
+        [ExcludeFromCodeCoverage]
         private JiraIssueResults GetIssueSearchResultsPaginated(string jql, int startAt, int maxResults)
         {
             var client = new RestClient(_url + "/rest/api/2") {Authenticator = new HttpBasicAuthenticator(_user, _pwd)};
@@ -116,6 +122,7 @@ namespace jr.common.Jira
             return tp;
         }
 
+        [ExcludeFromCodeCoverage]
         public IEnumerable<TempoWorkItem> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey)
         {
             var client = new RestClient(_url + "/rest/tempo-timesheets/3/")

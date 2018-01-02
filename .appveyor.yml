@@ -19,6 +19,7 @@ test_script:
     --logger:trx;LogFileName=results.trx /p:DebugType=full
     C:\projects\jira-reporting\test\jr.common.tests\jr.common.tests.csproj"
     -filter:"+[jr.common*]* -[jr.common.tests*]* -[jr.common.Jira.Models]*"
+    -excludebyattribute:*.ExcludeFromCodeCoverage
     -output:".\coverage.xml"
     -skipautoprops
     -oldstyle
