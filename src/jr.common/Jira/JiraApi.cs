@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using jr.common.Jira.Models;
 using Newtonsoft.Json;
@@ -44,15 +45,23 @@ namespace jr.common.Jira
 
             var response = client.Execute(request);
 
-            return JsonConvert.DeserializeObject<JiraIssue>(response.Content,
-                new JsonSerializerSettings
-                {
-                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                    DateParseHandling = DateParseHandling.None,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                }
-            );
+            if (response.IsSuccessful)
+            {
+                return JsonConvert.DeserializeObject<JiraIssue>(response.Content,
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                        DateParseHandling = DateParseHandling.None,
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    }
+                );
+            }
+            else
+            {
+                throw new Exception(response.StatusDescription);
+            }
+
         }
         
         [ExcludeFromCodeCoverage]
@@ -67,14 +76,21 @@ namespace jr.common.Jira
             request.AddUrlSegment("projectIdOrKey", projectId);
 
             var response = client.Execute(request);
-
-            return JsonConvert.DeserializeObject<JiraProject>(response.Content,
-                new JsonSerializerSettings
-                {
-                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                    DateParseHandling = DateParseHandling.None
-                }
-            );
+            
+            if (response.IsSuccessful)
+            {
+                return JsonConvert.DeserializeObject<JiraProject>(response.Content,
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                        DateParseHandling = DateParseHandling.None
+                    }
+                );
+            }
+            else
+            {
+                throw new Exception(response.StatusDescription);
+            }
         }
 
         [ExcludeFromCodeCoverage]
@@ -111,15 +127,23 @@ namespace jr.common.Jira
             if (maxResults > 0) request.AddParameter("maxResults", maxResults);
 
             var response = client.Execute(request);
-
-            var tp = JsonConvert.DeserializeObject<JiraIssueResults>(response.Content,
-                new JsonSerializerSettings
-                {
-                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                    DateParseHandling = DateParseHandling.None
-                }
-            );
-            return tp;
+            
+            if (response.IsSuccessful)
+            {
+                var tp = JsonConvert.DeserializeObject<JiraIssueResults>(response.Content,
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                        DateParseHandling = DateParseHandling.None
+                    }
+                );
+                return tp;
+            }
+            else
+            {
+                throw new Exception(response.StatusDescription);
+            }
+            
         }
 
         [ExcludeFromCodeCoverage]
@@ -137,17 +161,23 @@ namespace jr.common.Jira
 
             var response = client.Execute(request);
 
-            var arr = JsonConvert.DeserializeObject<TempoWorkItem[]>(response.Content,
-                new JsonSerializerSettings
-                {
-                    MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                    DateParseHandling = DateParseHandling.None
-                }
-            );
-
-            var twi = new List<TempoWorkItem>();
-            twi.AddRange(arr);
-            return twi;
+            if (response.IsSuccessful)
+            {
+                var arr = JsonConvert.DeserializeObject<TempoWorkItem[]>(response.Content,
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                        DateParseHandling = DateParseHandling.None
+                    }
+                );
+                var twi = new List<TempoWorkItem>();
+                twi.AddRange(arr);
+                return twi;
+            }
+            else
+            {
+                throw new Exception(response.StatusDescription);
+            }
         }
     }
 }
