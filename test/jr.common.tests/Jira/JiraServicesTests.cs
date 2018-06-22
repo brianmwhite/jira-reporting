@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using jr.common.Jira;
 using jr.common.Jira.Models;
 using jr.common.Models;
@@ -43,20 +44,75 @@ namespace jr.common.tests.Jira
         {
             var mockJiraApi = new Mock<IJiraApi>();
             mockJiraApi
-                .Setup(x => x.GetJiraProject(It.IsAny<long>()))
+                .Setup(x => x.GetJiraProject(It.IsAny<string>()))
                 .Returns(new JiraProject()
                 {
                     Name = "My Project",
                     Id = "1"
                 });
 
-
             mockJiraApi
-                .Setup(x => x.GetJiraIssue(It.IsAny<long>()))
+                .Setup(x => x.GetJiraIssue(It.Is<string>(i=>i.Equals("ABC-123"))))
                 .Returns(new JiraIssue
                 {
+                    Key = "ABC-123",
                     Fields = new IssueFields
                     {
+                        Summary = "This is my issue summary",
+                        Project = new Project
+                        {
+                            Id = "1",
+                        },
+                        Issuetype = new Issuetype()
+                        {
+                            Name = "Story"
+                        }
+                    }
+                });
+
+            mockJiraApi
+                .Setup(x => x.GetJiraIssue(It.Is<string>(i=>i.Equals("BCD-123"))))
+                .Returns(new JiraIssue
+                {
+                    Key = "BCD-123",
+                    Fields = new IssueFields
+                    {
+                        Summary = "This is my issue summary",
+                        Project = new Project
+                        {
+                            Id = "1",
+                        },
+                        Issuetype = new Issuetype()
+                        {
+                            Name = "Sub-task"
+                        },
+                        Parent = new Parent
+                        {
+                            Key = "ABC-123",
+                            Fields = new ParentFields()
+                            {
+                                Summary = "My parent issue summary"
+                            }
+                        }
+                    }
+                });
+            
+            mockJiraApi
+                .Setup(x => x.GetJiraIssue(It.Is<string>(i=>i.Equals("CDE-123"))))
+                .Returns(new JiraIssue
+                {
+                    Key = "CDE-123",
+                    Fields = new IssueFields
+                    {
+                        Summary = "This is my second issue summary",
+                        Project = new Project
+                        {
+                            Id = "1",
+                        },
+                        Issuetype = new Issuetype()
+                        {
+                            Name = "Story"
+                        },
                         Parent = new Parent
                         {
                             Key = "ABC-123",
@@ -75,14 +131,7 @@ namespace jr.common.tests.Jira
                     BilledSeconds = 900,
                     TempoIssue = new TempoIssue
                     {
-                        Key = "BCD-123",
-                        Summary = "This is my issue summary",
-                        ProjectId = 1,
-                        Id = 1,
-                        IssueType = new WorkItemIssueType
-                        {
-                            Name = "Sub-task"
-                        }
+                        Key = "BCD-123"
                     },
                     Author = new Author
                     {
@@ -95,13 +144,6 @@ namespace jr.common.tests.Jira
                     TempoIssue = new TempoIssue
                     {
                         Key = "CDE-123",
-                        Summary = "This is my second issue summary",
-                        ProjectId = 1,
-                        Id = 1,
-                        IssueType = new WorkItemIssueType
-                        {
-                            Name = "Story"
-                        }
                     },
                     Author = new Author
                     {
@@ -109,9 +151,11 @@ namespace jr.common.tests.Jira
                     },
                 }
             };
-            
+
+            var tempoResults = new TempoWorkItemResults {WorkItems = tempoWorkItemList.ToArray()};
+
             var js = new JiraServices(mockJiraApi.Object);
-            var convertedTempoWorkItems = js.ConvertTempoWorkItems(tempoWorkItemList, true);
+            var convertedTempoWorkItems = js.ConvertTempoWorkItems(new List<TempoWorkItemResults> {tempoResults}, true);
 
             var expectedWorkItem = new WorkItem
             {
@@ -198,7 +242,7 @@ namespace jr.common.tests.Jira
                 Status = "New",
             };
 
-            var js = new JiraServices(new JiraApi(string.Empty, string.Empty, string.Empty));
+            var js = new JiraServices(new JiraApi(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty));
             var convertedIssue = js.ConvertJiraIssueResults(jiraIssueResultsList).ToList()[0];
 
             Assert.Equal(expectedIssue.IssueKey, convertedIssue.IssueKey);
@@ -240,15 +284,18 @@ namespace jr.common.tests.Jira
 //            
 //            _tempoInput = new TempoInput(jiraUrl, jiraUser, jiraPwd);
 //        }
-//
+
 //        [Fact]
 //        public void GetTempoJson()
 //        {
-//            string outputJson = _tempoInput.GetWorkItemsJsonFromTempo(_dateFrom, _dateTo, _accountKey);
-//            List<TempoWorkItems> twi = _tempoInput.ConvertJsonToTempoWorkItemList(outputJson);
-//            Assert.NotEqual(string.Empty, outputJson);
+//            var ja = new JiraApi("https://smallfootprint.atlassian.net", "bwhite@smallfootprint.com","aDwMnc3p/B");
+//            var twi = ja.GetTempoWorkItems("2018-06-01", "2018-06-30", "NG001");
+//            
+////            string outputJson = TempoInput.GetWorkItemsJsonFromTempo(_dateFrom, _dateTo, _accountKey);
+////            List<TempoWorkItems> twi = _tempoInput.ConvertJsonToTempoWorkItemList(outputJson);
+//            Assert.NotNull(twi);
 //        }
-//
+
 //        [Fact]
 //        public void GetTempoProjectJson()
 //        {

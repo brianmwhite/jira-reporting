@@ -60,44 +60,56 @@ namespace jr.common.Jira
             return ConvertJiraIssueResults(_jiraApi.GetJiraIssuesFromProject(project));
         }
         
-        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItem> twi, bool getParentIssue = false)
+        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItemResults> twr, bool getParentIssue = false)
         {
             var wi = new List<WorkItem>();
-            var projectLookup = new Dictionary<long, string>();
-            foreach (TempoWorkItem item in twi)
+            var projectLookup = new Dictionary<string, string>();
+            var issueLookup = new Dictionary<string, JiraIssue>();
+            foreach (TempoWorkItemResults twi in twr)
             {
-                var w = new WorkItem
+                foreach (TempoWorkItem item in twi.WorkItems)
                 {
-                    issueKey = item.TempoIssue.Key,
-                    issueName = item.TempoIssue.Summary,
-                    billedHours = ConvertSecondsToHours(item.BilledSeconds),
-                    userName = item.Author.Name
-                };
-
-                if (projectLookup.ContainsKey(item.TempoIssue.ProjectId))
-                {
-                    w.project = projectLookup.GetValueOrDefault(item.TempoIssue.ProjectId);
-                }
-                else
-                {
-                    string projectName = _jiraApi.GetJiraProject(item.TempoIssue.ProjectId)?.Name ?? string.Empty;
-                    projectLookup.Add(item.TempoIssue.ProjectId, projectName);
-                    w.project = projectName;
-                }
-
-                if (getParentIssue && item.TempoIssue.IssueType.Name == "Sub-task")
-                {
-                    var ji = _jiraApi.GetJiraIssue(item.TempoIssue.Id);
-                    if (ji.Fields.Parent?.Fields != null)
+                    JiraIssue issue;
+                    if (issueLookup.ContainsKey(item.TempoIssue.Key))
                     {
-                        w.issueKey = ji.Fields.Parent.Key;
-                        w.issueName = ji.Fields.Parent.Fields.Summary;
+                        issue = issueLookup.GetValueOrDefault(item.TempoIssue.Key);
                     }
+                    else
+                    {
+                        issue = _jiraApi.GetJiraIssue(item.TempoIssue.Key);
+                        issueLookup.Add(issue.Key, issue);
+                    }
+                
+                    var w = new WorkItem
+                    {
+                        issueKey = item.TempoIssue.Key,
+                        issueName = issue.Fields.Summary,
+                        billedHours = ConvertSecondsToHours(item.BilledSeconds),
+                        userName = item.Author.Name
+                    };
+
+                    if (projectLookup.ContainsKey(issue.Fields.Project.Id))
+                    {
+                        w.project = projectLookup.GetValueOrDefault(issue.Fields.Project.Id);
+                    }
+                    else
+                    {
+                        string projectName = _jiraApi.GetJiraProject(issue.Fields.Project.Id)?.Name ?? string.Empty;
+                        projectLookup.Add(issue.Fields.Project.Id, projectName);
+                        w.project = projectName;
+                    }
+
+                    if (getParentIssue && issue.Fields.Issuetype.Name == "Sub-task")
+                    {
+                        if (issue.Fields.Parent?.Fields != null)
+                        {
+                            w.issueKey = issue.Fields.Parent.Key;
+                            w.issueName = issue.Fields.Parent.Fields.Summary;
+                        }
+                    }
+                    wi.Add(w);
                 }
-
-                wi.Add(w);
             }
-
             return wi;
         }
 

@@ -7,14 +7,14 @@ namespace jr.common.Jira.Models
         [JsonProperty("author")]
         public Author Author { get; set; }
 
-        [JsonProperty("billedSeconds")]
+        [JsonProperty("billableSeconds")]
         public long BilledSeconds { get; set; }
-
-        [JsonProperty("id")]
-        public long Id { get; set; }
 
         [JsonProperty("issue")]
         public TempoIssue TempoIssue { get; set; }
+
+        [JsonProperty("jiraWorklogId")]
+        public long JiraWorklogId { get; set; }
 
         [JsonProperty("timeSpentSeconds")]
         public long TimeSpentSeconds { get; set; }
@@ -22,31 +22,13 @@ namespace jr.common.Jira.Models
 
     public class TempoIssue
     {
-        [JsonProperty("id")]
-        public long Id { get; set; }
-
-        [JsonProperty("issueType")]
-        public WorkItemIssueType IssueType { get; set; }
-
         [JsonProperty("key")]
         public string Key { get; set; }
-
-        [JsonProperty("projectId")]
-        public long ProjectId { get; set; }
-
-        [JsonProperty("summary")]
-        public string Summary { get; set; }
-    }
-
-    public class WorkItemIssueType
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
     }
 
     public class Author
     {
-        [JsonProperty("name")]
+        [JsonProperty("username")]
         public string Name { get; set; }
     }
 }

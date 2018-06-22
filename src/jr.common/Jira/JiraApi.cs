@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using jr.common.Jira.Models;
 using Newtonsoft.Json;
@@ -11,9 +12,10 @@ namespace jr.common.Jira
     public interface IJiraApi
     {
         JiraIssue GetJiraIssue(long issueId);
-        JiraProject GetJiraProject(long projectId);
+        JiraIssue GetJiraIssue(string issueKey);
+        JiraProject GetJiraProject(string projectId);
         IEnumerable<JiraIssueResults> GetJiraIssuesFromProject(string project);
-        IEnumerable<TempoWorkItem> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey);
+        IEnumerable<TempoWorkItemResults> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey);
     }
 
     public class JiraApi : IJiraApi
@@ -23,13 +25,17 @@ namespace jr.common.Jira
         private readonly string _pwd;
         private readonly string _url;
         private readonly string _user;
+        private readonly string _tempoUrl;
+        private readonly string _tempoApiToken;
 
         [ExcludeFromCodeCoverage]
-        public JiraApi(string url, string user, string pwd)
+        public JiraApi(string url, string user, string pwd, string tempoUrl, string tempoApiToken)
         {
             _pwd = pwd;
             _user = user;
             _url = url;
+            _tempoUrl = tempoUrl;
+            _tempoApiToken = tempoApiToken;
         }
         
         [ExcludeFromCodeCoverage]
@@ -44,6 +50,7 @@ namespace jr.common.Jira
             request.AddUrlSegment("issueId", issueId);
 
             var response = client.Execute(request);
+            Debug.WriteLine($"QUERY: Get issue: Issue:{issueId}");
 
             if (response.IsSuccessful)
             {
@@ -65,7 +72,40 @@ namespace jr.common.Jira
         }
         
         [ExcludeFromCodeCoverage]
-        public JiraProject GetJiraProject(long projectId)
+        public JiraIssue GetJiraIssue(string issueKey)
+        {
+            var client = new RestClient(_url + "/rest/api/2")
+            {
+                Authenticator = new HttpBasicAuthenticator(_user, _pwd)
+            };
+
+            var request = new RestRequest("issue/{issueKey}", Method.GET);
+            request.AddUrlSegment("issueKey", issueKey);
+
+            var response = client.Execute(request);
+            Debug.WriteLine($"QUERY: Get issue: Issue:{issueKey}");
+
+            if (response.IsSuccessful)
+            {
+                return JsonConvert.DeserializeObject<JiraIssue>(response.Content,
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                        DateParseHandling = DateParseHandling.None,
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    }
+                );
+            }
+            else
+            {
+                throw new Exception(response.StatusDescription);
+            }
+
+        }
+        
+        [ExcludeFromCodeCoverage]
+        public JiraProject GetJiraProject(string projectId)
         {
             var client = new RestClient(_url + "/rest/api/2/")
             {
@@ -76,6 +116,7 @@ namespace jr.common.Jira
             request.AddUrlSegment("projectIdOrKey", projectId);
 
             var response = client.Execute(request);
+            Debug.WriteLine($"QUERY: Get project: Project:{projectId}");
             
             if (response.IsSuccessful)
             {
@@ -127,6 +168,7 @@ namespace jr.common.Jira
             if (maxResults > 0) request.AddParameter("maxResults", maxResults);
 
             var response = client.Execute(request);
+            Debug.WriteLine($"QUERY: Get Issues:{jql}, offset:{startAt}, maxResults:{maxResults}");
             
             if (response.IsSuccessful)
             {
@@ -147,32 +189,84 @@ namespace jr.common.Jira
         }
 
         [ExcludeFromCodeCoverage]
-        public IEnumerable<TempoWorkItem> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey)
+        public IEnumerable<TempoWorkItemResults> GetTempoWorkItems(string dateFrom, string dateTo, string accountKey)
         {
-            var client = new RestClient(_url + "/rest/tempo-timesheets/3/")
+            var resultsCollection = new List<TempoWorkItemResults>();
+
+            string next = string.Empty;
+            
+            TempoWorkItemResults firstResult = GetTempoSearchResultsPaginated(accountKey, dateFrom, dateTo, 0, 0);
+            resultsCollection.Add(firstResult);
+            if (!string.IsNullOrEmpty(firstResult.Metadata.Next))
             {
-                Authenticator = new HttpBasicAuthenticator(_user, _pwd)
+                next = firstResult.Metadata.Next;
+                while (!string.IsNullOrEmpty(next))
+                {
+                    TempoWorkItemResults results = GetTempoSearchResultsPaginated(next);
+                    resultsCollection.Add(results);
+                    next = results.Metadata.Next;
+                }
+            }
+
+            return resultsCollection;
+
+        }
+
+        private TempoWorkItemResults GetTempoSearchResultsPaginated(string url)
+        {
+            var client = new RestClient(url)
+            {
+                Authenticator = new JwtAuthenticator(_tempoApiToken)
             };
-
-            var request = new RestRequest("worklogs", Method.GET);
-            request.AddQueryParameter("dateFrom", dateFrom);
-            request.AddQueryParameter("dateTo", dateTo);
-            request.AddQueryParameter("accountKey", accountKey);
-
+            
+            var request = new RestRequest(Method.GET);
             var response = client.Execute(request);
-
+            Debug.WriteLine($"QUERY: Get worklogs: URL:{url}");
+            
             if (response.IsSuccessful)
             {
-                var arr = JsonConvert.DeserializeObject<TempoWorkItem[]>(response.Content,
+                var tp = JsonConvert.DeserializeObject<TempoWorkItemResults>(response.Content,
                     new JsonSerializerSettings
                     {
                         MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
                         DateParseHandling = DateParseHandling.None
                     }
                 );
-                var twi = new List<TempoWorkItem>();
-                twi.AddRange(arr);
-                return twi;
+                return tp;
+            }
+            else
+            {
+                throw new Exception(response.StatusDescription);
+            }
+        }
+
+        private TempoWorkItemResults GetTempoSearchResultsPaginated(string accountKey, string dateFrom, string dateTo, int startAt, int maxResults)
+        {
+            var client = new RestClient(_tempoUrl + "/2/")
+            {
+                Authenticator = new JwtAuthenticator(_tempoApiToken)
+            };
+            
+            var request = new RestRequest("worklogs/account/{accountKey}", Method.GET);
+            request.AddUrlSegment("accountKey",accountKey);
+            request.AddQueryParameter("from", dateFrom);
+            request.AddQueryParameter("to", dateTo);
+            request.AddParameter("offset", startAt);
+            if (maxResults > 0) request.AddParameter("limit", maxResults);
+
+            var response = client.Execute(request);
+            Debug.WriteLine($"QUERY: Get worklogs: Account:{accountKey},F:{dateFrom},T:{dateTo},offset:{startAt},limit:{maxResults}");
+            
+            if (response.IsSuccessful)
+            {
+                var tp = JsonConvert.DeserializeObject<TempoWorkItemResults>(response.Content,
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                        DateParseHandling = DateParseHandling.None
+                    }
+                );
+                return tp;
             }
             else
             {

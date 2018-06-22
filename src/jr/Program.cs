@@ -47,7 +47,7 @@ namespace jr
                 {
                     userOptions = GetUserOptions(optionConfigFileLocation);
                     var credentials = LocalProfileInfo.LoadJiraCredentials();
-                    var jiraApi = new JiraApi(credentials.JiraURL, credentials.JiraUser, credentials.JiraPassword);
+                    var jiraApi = new JiraApi(credentials.JiraUrl, credentials.JiraUser, credentials.JiraPassword, credentials.TempoUrl, credentials.TempoToken);
                     var jiraSerices = new JiraServices(jiraApi);
                     
                     if (optionOutputFormat.HasValue())
@@ -93,7 +93,7 @@ namespace jr
                     //TODO: check for local credentials first
 
                     var jc = LocalProfileInfo.LoadJiraCredentials();
-                    var jiraApi = new JiraApi(jc.JiraURL, jc.JiraUser, jc.JiraPassword);
+                    var jiraApi = new JiraApi(jc.JiraUrl, jc.JiraUser, jc.JiraPassword, jc.TempoUrl, jc.TempoToken);
                     var jiraServices = new JiraServices(jiraApi);
 
                     //TODO: parse/catch invalid date strings
@@ -206,12 +206,20 @@ namespace jr
 
                 Console.Write("password: ");
                 var password = Console.ReadLine();
+                
+                Console.Write("tempo api url: ");
+                var tempoUrl = Console.ReadLine();
+
+                Console.Write("tempo api token: ");
+                var tempoApiToken = Console.ReadLine();
 
                 var jc = new JiraCredentials
                 {
-                    JiraURL = url,
+                    JiraUrl = url,
                     JiraUser = login,
-                    JiraPassword = password
+                    JiraPassword = password,
+                    TempoUrl = tempoUrl,
+                    TempoToken = tempoApiToken
                 };
                 var json = JsonConvert.SerializeObject(jc);
                 LocalProfileInfo.CreateJiraCredentialsFile(json);

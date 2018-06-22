@@ -11,6 +11,12 @@ namespace jr
         public string JiraPassword { get; set; }
         
         [JsonProperty("jiraURL")]
-        public string JiraURL { get; set; }
+        public string JiraUrl { get; set; }
+        
+        [JsonProperty("tempoURL")]
+        public string TempoUrl { get; set; }
+        
+        [JsonProperty("tempoToken")]
+        public string TempoToken { get; set; }
     }
 }
