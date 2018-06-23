@@ -54,6 +54,9 @@ namespace jr.common.Jira.Models
         
         [JsonProperty("fixVersions")]
         public FixVersion[] FixVersions { get; set; }
+        
+        [JsonProperty("labels")]
+        public string[] Labels { get; set; }
     }
 
     public class Project

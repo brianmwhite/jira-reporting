@@ -57,6 +57,7 @@ namespace jr.common
                         issue = x.First().combinedIssueName,
                         dev_rate = _devRate,
                         mgmt_rate = _mgmtRate,
+                        label = x.First().label,
                         dev_hours = x.Sum(z => GetHoursBasedOnRole(z, HourType.Developer)),
                         mgmt_hours = x.Sum(z => GetHoursBasedOnRole(z, HourType.Manager)),
                     }
@@ -140,6 +141,9 @@ namespace jr.common
                             break;
                         case ("Issue"):
                             values[dataRowNumber] = string.Format(culture, "{0}", row.issue);
+                            break;
+                        case ("Label"):
+                            values[dataRowNumber] = string.Format(culture, "{0}", row.label);
                             break;
                         case ("Dev_Hours"):
                             values[dataRowNumber] = string.Format(culture, "{0:N2}", row.dev_hours);

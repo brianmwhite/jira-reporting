@@ -5,7 +5,8 @@
         "time_period": "",
         "date_start": "",
         "date_end": "",
-        "groupby": "project"
+        "groupby": "project",
+        "labels": "label1, label2"
     },
     "billing-setup": {
         "dev_rate": 0,

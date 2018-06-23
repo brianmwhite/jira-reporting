@@ -63,7 +63,10 @@ namespace jr
 
         [JsonProperty("groupby")]
         public string Groupby { get; set; }
-
+        
+        [JsonProperty("labels")]
+        public string[] Labels { get; set; }
+        
         [JsonProperty("hide-non-billable")]
         public bool HideNonBillable { get; set; }
 

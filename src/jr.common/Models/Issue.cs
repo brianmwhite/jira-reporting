@@ -6,6 +6,8 @@
         
         public string IssueName { get; set; }
         
+        public string Label { get; set; }
+        
         public string CombinedIssueName => string.Format("[{0}] {1}", IssueKey, IssueName);
         
         public string Epic { get; set; }

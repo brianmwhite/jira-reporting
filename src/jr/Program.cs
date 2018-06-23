@@ -135,7 +135,7 @@ namespace jr
                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
 
                     var wi = jiraServices.GetWorkItems(userOptions.Filtering.DateStart, userOptions.Filtering.DateEnd,
-                        userOptions.Filtering.Account, getParentIssue);
+                        userOptions.Filtering.Account, userOptions.Filtering.Labels, getParentIssue);
 
                     var tempoOutput = GenerateTimeSummaryText(userOptions, wi);
                     Console.WriteLine(tempoOutput);

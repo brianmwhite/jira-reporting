@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using jr.common.Jira.Models;
@@ -8,7 +9,8 @@ namespace jr.common.Jira
 {
     public interface IJiraServices
     {
-        IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey, bool getParentIssue = false);
+        IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey, string[] labelWhiteList,
+            bool getParentIssue = false);
         IEnumerable<Issue> GetIssuesFromProject(string project);
     }
 
@@ -49,10 +51,24 @@ namespace jr.common.Jira
             return sprintName;
         }
 
-        
-        public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey, bool getParentIssue = false)
+        public static string ExtractSingleLabel(string[] whiteList, string[] labels)
         {
-            return ConvertTempoWorkItems(_jiraApi.GetTempoWorkItems(dateFrom, dateTo, accountKey), getParentIssue);
+            if (whiteList == null || labels == null) return string.Empty;
+            foreach (string s in whiteList)
+            {
+                string result = Array.Find(labels, x => x.Equals(s));
+                if (!string.IsNullOrEmpty(result))
+                {
+                    return result;
+                }
+            }
+            return string.Empty;
+        }
+        
+        public IEnumerable<WorkItem> GetWorkItems(string dateFrom, string dateTo, string accountKey,
+            string[] labelWhiteList, bool getParentIssue = false)
+        {
+            return ConvertTempoWorkItems(_jiraApi.GetTempoWorkItems(dateFrom, dateTo, accountKey), labelWhiteList, getParentIssue);
         }
         
         public IEnumerable<Issue> GetIssuesFromProject(string project)
@@ -60,7 +76,7 @@ namespace jr.common.Jira
             return ConvertJiraIssueResults(_jiraApi.GetJiraIssuesFromProject(project));
         }
         
-        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItemResults> twr, bool getParentIssue = false)
+        public IEnumerable<WorkItem> ConvertTempoWorkItems(IEnumerable<TempoWorkItemResults> twr, string[] labelWhiteList, bool getParentIssue = false)
         {
             var wi = new List<WorkItem>();
             var projectLookup = new Dictionary<string, string>();
@@ -85,7 +101,8 @@ namespace jr.common.Jira
                         issueKey = item.TempoIssue.Key,
                         issueName = issue.Fields.Summary,
                         billedHours = ConvertSecondsToHours(item.BilledSeconds),
-                        userName = item.Author.Name
+                        userName = item.Author.Name,
+                        label = ExtractSingleLabel(labelWhiteList, issue.Fields.Labels)
                     };
 
                     if (projectLookup.ContainsKey(issue.Fields.Project.Id))
@@ -105,6 +122,7 @@ namespace jr.common.Jira
                         {
                             w.issueKey = issue.Fields.Parent.Key;
                             w.issueName = issue.Fields.Parent.Fields.Summary;
+                            w.label = ExtractSingleLabel(labelWhiteList, issue.Fields.Labels);
                         }
                     }
                     wi.Add(w);

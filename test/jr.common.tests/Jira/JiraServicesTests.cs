@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using jr.common.Jira;
 using jr.common.Jira.Models;
 using jr.common.Models;
@@ -155,7 +154,7 @@ namespace jr.common.tests.Jira
             var tempoResults = new TempoWorkItemResults {WorkItems = tempoWorkItemList.ToArray()};
 
             var js = new JiraServices(mockJiraApi.Object);
-            var convertedTempoWorkItems = js.ConvertTempoWorkItems(new List<TempoWorkItemResults> {tempoResults}, true);
+            var convertedTempoWorkItems = js.ConvertTempoWorkItems(new List<TempoWorkItemResults> {tempoResults}, new string[]{}, true);
 
             var expectedWorkItem = new WorkItem
             {
@@ -392,6 +391,21 @@ namespace jr.common.tests.Jira
 
             int[] expectedPages = {};
             Assert.Equal(expectedPages, pages);
+        }
+
+        [Fact]
+        public void ExtractSingleLabelTest()
+        {
+            Assert.Equal("Hat", JiraServices.ExtractSingleLabel(new[] {"CDE", "Hat"}, new[] {"ABC", "CAR", "Hat"}));
+            Assert.Equal("CDE", JiraServices.ExtractSingleLabel(new[] {"CDE", "Hat"}, new[] {"ABC", "Hat", "CDE"}));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(new[] {"YOLO", "Dog"}, new[] {"ABC", "Hat", "CDE"}));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(new[] {"YOLO", "Dog"}, new string[]{}));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(new string[]{}, new string[]{}));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(null, null));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(new string[]{}, new[] {"ABC", "CAR", "Hat"}));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(null, new[] {"ABC", "CAR", "Hat"}));
+            Assert.Equal("", JiraServices.ExtractSingleLabel(new[] {"YOLO", "Dog"}, null));
+
         }
     }
 }

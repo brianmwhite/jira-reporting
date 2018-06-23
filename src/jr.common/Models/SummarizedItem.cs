@@ -61,6 +61,7 @@ namespace jr.common.Models
             }
         }
         public string issue { get; set; }
+        public string label { get; set; }
         public double dev_hours { get; set; }
         public double dev_rate { get; set; }
         public double mgmt_hours { get; set; }
