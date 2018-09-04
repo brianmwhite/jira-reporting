@@ -27,7 +27,7 @@ namespace jr.common.tests.TestSetup
             s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-444] hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit","12.50","$0.00","0.00","$0.00","12.50","$0.00"});
             s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-445] dolor. Quisque tincidunt pede ac urna. Ut","0.50","$0.00","0.00","$0.00","0.50","$0.00"});
             s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-446] semper cursus. Integer mollis. Integer tincidunt aliquam arcu. Aliquam","9.00","$0.00","0.00","$0.00","9.00","$0.00"});
-            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-448] Aliquam adipiscing lobortis risus. In mi pede, nonummy","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
+            s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-448] \"Aliquam\" adipiscing lobortis risus. In mi pede, nonummy","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
             s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-456] at lacus. Quisque purus sapien,","7.00","$0.00","0.00","$0.00","7.00","$0.00"});
             s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-459] vitae velit egestas lacinia.","1.00","$0.00","0.00","$0.00","1.00","$0.00"});
             s.Add(new[] {"Alpha Beta - Project 1 #ABC00001","[ABC-460] tempor lorem, eget mollis lectus","1.50","$0.00","0.00","$0.00","1.50","$0.00"});
@@ -102,7 +102,7 @@ namespace jr.common.tests.TestSetup
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-444] hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit", dev_hours = 12.5, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-445] dolor. Quisque tincidunt pede ac urna. Ut", dev_hours = 0.5, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-446] semper cursus. Integer mollis. Integer tincidunt aliquam arcu. Aliquam", dev_hours = 9, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
-            si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-448] Aliquam adipiscing lobortis risus. In mi pede, nonummy", dev_hours = 1, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
+            si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-448] \"Aliquam\" adipiscing lobortis risus. In mi pede, nonummy", dev_hours = 1, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-456] at lacus. Quisque purus sapien,", dev_hours = 7, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-459] vitae velit egestas lacinia.", dev_hours = 1, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
             si.Add(new SummarizedItem() { project = "Alpha Beta - Project 1 #ABC00001", issue = "[ABC-460] tempor lorem, eget mollis lectus", dev_hours = 1.5, mgmt_hours = 0, dev_rate = 0, mgmt_rate = 0});
@@ -150,7 +150,7 @@ namespace jr.common.tests.TestSetup
             workItems.Add(new WorkItem() { project = "Alpha Beta - Project 1 #ABC00001", billedHours = 1.5, userName = "dramos", issueKey = "ABC-444", issueName = "hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit" });
             workItems.Add(new WorkItem() { project = "Alpha Beta - Project 1 #ABC00001", billedHours = 3, userName = "dramos", issueKey = "ABC-444", issueName = "hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit" });
             workItems.Add(new WorkItem() { project = "Alpha Beta - Project 1 #ABC00001", billedHours = 0.5, userName = "vburgess", issueKey = "ABC-445", issueName = "dolor. Quisque tincidunt pede ac urna. Ut" });
-            workItems.Add(new WorkItem() { project = "Alpha Beta - Project 1 #ABC00001", billedHours = 1, userName = "vburgess", issueKey = "ABC-448", issueName = "Aliquam adipiscing lobortis risus. In mi pede, nonummy" });
+            workItems.Add(new WorkItem() { project = "Alpha Beta - Project 1 #ABC00001", billedHours = 1, userName = "vburgess", issueKey = "ABC-448", issueName = "\"Aliquam\" adipiscing lobortis risus. In mi pede, nonummy" });
             workItems.Add(new WorkItem() { project = "Alpha Beta - Project 3 #ABC00008", billedHours = 0.5, userName = "vburgess", issueKey = "CDE-844", issueName = "risus. Donec egestas. Aliquam nec" });
             workItems.Add(new WorkItem() { project = "Alpha Beta - Project 2 #ABC00006", billedHours = 1.5, userName = "vburgess", issueKey = "BCD-250", issueName = "pellentesque a, facilisis non, bibendum" });
             workItems.Add(new WorkItem() { project = "Alpha Beta - Project 2 #ABC00006", billedHours = 2, userName = "dramos", issueKey = "BCD-250", issueName = "pellentesque a, facilisis non, bibendum" });

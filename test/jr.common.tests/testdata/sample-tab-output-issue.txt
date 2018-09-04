@@ -7,7 +7,7 @@
 "Alpha Beta - Project 1 #ABC00001"	"[ABC-444] hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit"	"12.50"	"$0.00"	"0.00"	"$0.00"	"12.50"	"$0.00"
 "Alpha Beta - Project 1 #ABC00001"	"[ABC-445] dolor. Quisque tincidunt pede ac urna. Ut"	"0.50"	"$0.00"	"0.00"	"$0.00"	"0.50"	"$0.00"
 "Alpha Beta - Project 1 #ABC00001"	"[ABC-446] semper cursus. Integer mollis. Integer tincidunt aliquam arcu. Aliquam"	"9.00"	"$0.00"	"0.00"	"$0.00"	"9.00"	"$0.00"
-"Alpha Beta - Project 1 #ABC00001"	"[ABC-448] Aliquam adipiscing lobortis risus. In mi pede, nonummy"	"1.00"	"$0.00"	"0.00"	"$0.00"	"1.00"	"$0.00"
+"Alpha Beta - Project 1 #ABC00001"	"[ABC-448] ""Aliquam"" adipiscing lobortis risus. In mi pede, nonummy"	"1.00"	"$0.00"	"0.00"	"$0.00"	"1.00"	"$0.00"
 "Alpha Beta - Project 1 #ABC00001"	"[ABC-456] at lacus. Quisque purus sapien,"	"7.00"	"$0.00"	"0.00"	"$0.00"	"7.00"	"$0.00"
 "Alpha Beta - Project 1 #ABC00001"	"[ABC-459] vitae velit egestas lacinia."	"1.00"	"$0.00"	"0.00"	"$0.00"	"1.00"	"$0.00"
 "Alpha Beta - Project 1 #ABC00001"	"[ABC-460] tempor lorem, eget mollis lectus"	"1.50"	"$0.00"	"0.00"	"$0.00"	"1.50"	"$0.00"

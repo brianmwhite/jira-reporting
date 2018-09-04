@@ -26,6 +26,16 @@ namespace jr.common.tests
 
             Assert.Equal(expectedOutput, output);
         }
+        
+        [Fact]
+        public void GenerateSeparatedValueTextOutput_GroupByIssueCSV_Test()
+        {
+            List<string[]> strOutput = SetupData.CreateStringArrayList_GroupByIssue();
+            string output = OutputUtils.GenerateSeparatedValueTextOutput(strOutput, ',');
+            string expectedOutput = TestUtils.GetTextFromResource("sample-tab-output-issue.csv");
+
+            Assert.Equal(expectedOutput, output);
+        }
 
         [Fact]
         public void CreateOutputString_Tab_Test()
