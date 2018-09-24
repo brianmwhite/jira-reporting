@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using jr.common.Models;
 
 namespace jr.common
@@ -7,39 +8,47 @@ namespace jr.common
     {
         public static string GenerateSummaryText(IEnumerable<Issue> issues, OutputUtils.OutputFormat format)
         {
-            var dataTable = GenerateOutputData(issues);
-            return OutputUtils.CreateOutputString(format, dataTable);
+            var outputData = GenerateOutputData(issues);
+            return OutputUtils.CreateOutputString(format, outputData);
         }
 
         public static List<string[]> GenerateOutputData(IEnumerable<Issue> issues)
         {
-            var stringCollection = new List<string[]>();
+            var outputData = new List<string[]>
+            {
+                AddHeaderRow()
+            };
 
-            stringCollection.Add(new[]
+            outputData.AddRange(issues.Select(AddIssueRow));
+
+            return outputData;
+        }
+
+        private static string[] AddHeaderRow()
+        {
+            return new[]
             {
                 "Epic", "Issue Key", "Issue Summary", "Issue", "Issue Type", "Status", "Team", "Version", "Sprint",
                 "Story Points"
-            });
-
-            foreach (var issue in issues)
+            };
+        }
+        
+        private static string[] AddIssueRow(Issue issue)
+        {
+            var itemRow = new List<string>
             {
-                var row = new List<string>
-                {
-                    issue.Epic ?? string.Empty,
-                    issue.IssueKey ?? string.Empty,
-                    issue.IssueName ?? string.Empty,
-                    issue.CombinedIssueName ?? string.Empty,
-                    issue.IssueType ?? string.Empty,
-                    issue.Status ?? string.Empty,
-                    issue.Team ?? string.Empty,
-                    issue.Version ?? string.Empty,
-                    issue.Sprint ?? string.Empty,
-                    issue.StoryPoints?.ToString() ?? string.Empty
-                };
-                stringCollection.Add(row.ToArray());
-            }
-
-            return stringCollection;
+                issue.Epic ?? string.Empty,
+                issue.IssueKey ?? string.Empty,
+                issue.IssueName ?? string.Empty,
+                issue.CombinedIssueName ?? string.Empty,
+                issue.IssueType ?? string.Empty,
+                issue.Status ?? string.Empty,
+                issue.Team ?? string.Empty,
+                issue.Version ?? string.Empty,
+                issue.Sprint ?? string.Empty,
+                issue.StoryPoints?.ToString() ?? string.Empty
+            };
+            return itemRow.ToArray();
         }
     }
 }
