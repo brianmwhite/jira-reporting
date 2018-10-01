@@ -7,6 +7,12 @@ using FluentDateTime;
 
 namespace jr.common
 {
+    public class DateRange
+    {
+        public DateTime DateStart { get; set; }
+        public DateTime DateEnd { get; set; }
+    }
+    
     public static class OutputUtils
     {
         public enum OutputFormat
@@ -37,11 +43,16 @@ namespace jr.common
             foreach (var t in dataTable)
             {
                 var newList = string.Join(fieldSeparator, t
-                        .Select(x => string.Format("\"{0}\"", x.Replace("\"","\"\"")))
+                        .Select(x => string.Format("\"{0}\"", EscapeQuotes(x)))
                         .ToList());
                 output.AppendLine(newList);
             }
             return output.ToString();
+        }
+
+        private static string EscapeQuotes(string input)
+        {
+            return input.Replace("\"","\"\"");
         }
 
         public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString)
@@ -51,44 +62,33 @@ namespace jr.common
 
         public static (string datestart, string dateend) GetTimePeriodOption(string timePeriodString, DateTime today)
         {
-            string datestart;
-            string dateend;
+            const string dateFormatPattern = "yyyy-MM-dd";
+            var dateRange = new DateRange();
             switch (timePeriodString)
             {
                 case "ytd":
-                    datestart = today.FirstDayOfYear()
-                        .ToString("yyyy-MM-dd");
-                    dateend = today.ToString("yyyy-MM-dd");
-                    break;
-                case "month":
-                    datestart = today.FirstDayOfMonth()
-                        .ToString("yyyy-MM-dd");
-                    dateend = today.ToString("yyyy-MM-dd");
+                    dateRange.DateStart = today.FirstDayOfYear();
+                    dateRange.DateEnd = today;
                     break;
                 case "lastmonth":
-                    datestart = today.PreviousMonth()
-                        .FirstDayOfMonth().ToString("yyyy-MM-dd");
-                    dateend = today.PreviousMonth()
-                        .LastDayOfMonth().ToString("yyyy-MM-dd");
+                    dateRange.DateStart = today.PreviousMonth().FirstDayOfMonth();
+                    dateRange.DateEnd = today.PreviousMonth().LastDayOfMonth();
                     break;
                 case "week":
-                    datestart = today.FirstDayOfWeek()
-                        .ToString("yyyy-MM-dd");
-                    dateend = today.ToString("yyyy-MM-dd");
+                    dateRange.DateStart = today.FirstDayOfWeek();
+                    dateRange.DateEnd = today;
                     break;
                 case "lastweek":
-                    datestart = today.WeekEarlier()
-                        .FirstDayOfWeek().ToString("yyyy-MM-dd");
-                    dateend = today.WeekEarlier()
-                        .LastDayOfWeek().ToString("yyyy-MM-dd");
+                    dateRange.DateStart = today.WeekEarlier().FirstDayOfWeek();
+                    dateRange.DateEnd = today.WeekEarlier().LastDayOfWeek();
                     break;
+                case "month":
                 default:
-                    datestart = today.FirstDayOfMonth()
-                        .ToString("yyyy-MM-dd");
-                    dateend = today.ToString("yyyy-MM-dd");
+                    dateRange.DateStart = today.FirstDayOfMonth();
+                    dateRange.DateEnd = today;
                     break;
             }
-            return (datestart, dateend);
+            return (dateRange.DateStart.ToString(dateFormatPattern), dateRange.DateEnd.ToString(dateFormatPattern));
         }
 
         public static string CreateOutputString(OutputFormat format, List<string[]> dataTable)
