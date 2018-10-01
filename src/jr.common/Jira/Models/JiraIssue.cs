@@ -46,7 +46,17 @@ namespace jr.common.Jira.Models
         [JsonProperty("customfield_10004")]
         public long? StoryPoints {get; set;}
         
-        [JsonProperty("customfield_11600")]
+//TODO: deal with Team property, was a string but now is a complex object, at least for subtasks
+        /*
+        "customfield_11600": {
+            "isEditable": false,
+            "nonEditableReason": {
+                "message": "The team for a sub-task is inherited from the parent issue.",
+                "reason": "CANNOT_SET_ON_SUBTASK"
+            }
+        },
+         */
+//        [JsonProperty("customfield_11600")]
         public string Team {get; set;}
         
         [JsonProperty("customfield_10006")]

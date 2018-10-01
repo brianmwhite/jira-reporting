@@ -38,6 +38,7 @@ namespace jr.common.Jira
             _tempoApiToken = tempoApiToken;
         }
         
+//TODO: consolidate GetJiraIssue methods, shouldn't have two almost exact methods between issueId and issueKey        
         [ExcludeFromCodeCoverage]
         public JiraIssue GetJiraIssue(long issueId)
         {
@@ -54,19 +55,27 @@ namespace jr.common.Jira
 
             if (response.IsSuccessful)
             {
-                return JsonConvert.DeserializeObject<JiraIssue>(response.Content,
-                    new JsonSerializerSettings
-                    {
-                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                        DateParseHandling = DateParseHandling.None,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    }
-                );
+                try
+                {
+                    var issue = JsonConvert.DeserializeObject<JiraIssue>(response.Content,
+                        new JsonSerializerSettings
+                        {
+                            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                            DateParseHandling = DateParseHandling.None,
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        }
+                    );
+                    return issue;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Issue ID={issueId}, Json={response.Content}, Exception={e.Message}{e.StackTrace}");
+                }
             }
             else
             {
-                throw new Exception(response.StatusDescription);
+                throw new Exception($"Issue ID={issueId}, Response Status={response.StatusDescription}");
             }
 
         }
@@ -87,22 +96,31 @@ namespace jr.common.Jira
 
             if (response.IsSuccessful)
             {
-                return JsonConvert.DeserializeObject<JiraIssue>(response.Content,
-                    new JsonSerializerSettings
-                    {
-                        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                        DateParseHandling = DateParseHandling.None,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    }
-                );
+                try
+                {
+                    var issue = JsonConvert.DeserializeObject<JiraIssue>(response.Content,
+                        new JsonSerializerSettings
+                        {
+                            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                            DateParseHandling = DateParseHandling.None,
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        }
+                    );
+                    return issue;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Issue ID={issueKey}, Json={response.Content}, Exception={e.Message}{e.StackTrace}");
+                }
             }
             else
             {
-                throw new Exception(response.StatusDescription);
+                throw new Exception($"Issue ID={issueKey}, Response Status={response.StatusDescription}");
             }
 
         }
+
         
         [ExcludeFromCodeCoverage]
         public JiraProject GetJiraProject(string projectId)
