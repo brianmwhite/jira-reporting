@@ -81,6 +81,7 @@ namespace jr
             var optionDateRange = command.Option("-d|--daterange <dates>", "Date Range", CommandOptionType.MultipleValue);
             var optionGroupBy = command.Option("-g|--groupby <groupby>", "Group by <project>, <issue>", CommandOptionType.SingleValue);
             var optionOutputFormat = command.Option("-o|--output <output>", "csv,tab,pretty", CommandOptionType.SingleValue);
+            var optionTotalRow = command.Option("--totalrow", "true,false", CommandOptionType.SingleValue);
 
             command.OnExecute(() =>
             {
@@ -130,6 +131,12 @@ namespace jr
                     if (optionOutputFormat.HasValue())
                     {
                         userOptions.Output.Format = optionOutputFormat.Value();
+                    }
+
+                    if (optionTotalRow.HasValue())
+                    {
+                        bool.TryParse(optionTotalRow.Value(), out var convertedBoolValue);
+                        userOptions.Output.IncludeTotalRow = convertedBoolValue;
                     }
 
                     bool getParentIssue = userOptions.Filtering.Groupby == "issue";
@@ -234,6 +241,7 @@ namespace jr
                 , userOptions.BillingSetup.MgmtUsernames
                 , userOptions.Advanced.SplitPo
                 , userOptions.Advanced.Trim
+                , userOptions.Output.IncludeTotalRow
                 , userOptions.Output.Col
                 , userOptions.Filtering.Groupby
             );

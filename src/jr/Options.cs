@@ -45,6 +45,9 @@ namespace jr
 
         [JsonProperty("format")]
         public string Format { get; set; } = string.Empty;
+        
+        [JsonProperty("totalrow")]
+        public bool IncludeTotalRow { get; set; }
     }
 
     public class Filtering

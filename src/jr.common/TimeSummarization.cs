@@ -20,9 +20,10 @@ namespace jr.common
         private readonly string _projectTextToTrim;
         private readonly bool _groupByIssue;
         private readonly string _outputColumns;
+        private readonly bool _includeTotalRow;
 
         public TimeSummarization(double devRate, double mgmtRate, string[] mgmtUsers ,bool splitPo
-                                ,string projectTextToTrim ,string outputColumns = "", string groupByString = "project")
+                                ,string projectTextToTrim , bool includeTotalRow, string outputColumns = "", string groupByString = "project")
         {
             _devRate = devRate;
             _mgmtRate = mgmtRate;
@@ -30,6 +31,7 @@ namespace jr.common
 
             _splitPo = splitPo;
             _projectTextToTrim = projectTextToTrim;
+            _includeTotalRow = includeTotalRow;
 
             _groupByIssue = groupByString == "issue";
             
@@ -41,7 +43,10 @@ namespace jr.common
         public string GenerateSummaryText(IEnumerable<WorkItem> workItems, OutputUtils.OutputFormat format)
         {
             var si = SummarizeWorkItems(workItems);
-            si.Add(AddSummarizedTotal(si));
+            if (_includeTotalRow)
+            {
+                si.Add(AddSummarizedTotal(si));               
+            }
             List<string[]> dataTable = GenerateOutputData(si);
             return OutputUtils.CreateOutputString(format, dataTable);
         }

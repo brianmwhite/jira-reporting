@@ -21,6 +21,7 @@ namespace jr.common.tests
                 , splitPo: false
                 , projectTextToTrim: ""
                 , outputColumns: "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                , includeTotalRow: true
                 , groupByString: "project"
             );
             
@@ -44,6 +45,7 @@ namespace jr.common.tests
                 , splitPo: false
                 , projectTextToTrim: ""
                 , outputColumns: "Project,Issue,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                , includeTotalRow: true
                 , groupByString: "issue"
             );
             
@@ -68,6 +70,7 @@ namespace jr.common.tests
                 , splitPo: false
                 , projectTextToTrim: ""
                 , outputColumns: "Project,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                , includeTotalRow: true
                 , groupByString: "project"
             );
             
@@ -90,6 +93,7 @@ namespace jr.common.tests
                 , splitPo: false
                 , projectTextToTrim: ""
                 , outputColumns: "Project,Issue,Dev_Hours,Dev_Amount,Mgmt_Hours,Mgmt_Amount,Total_Hours,Total_Amount"
+                , includeTotalRow: true
                 , groupByString: "issue"
             );
             
@@ -102,7 +106,7 @@ namespace jr.common.tests
         [Fact]
         public void AddSummarizedTotalTest()
         {
-            var ts = new TimeSummarization(10,20,null,false,string.Empty);
+            var ts = new TimeSummarization(10,20,null,false,string.Empty,true);
             var rows = new List<SummarizedItem>
             {
                 new SummarizedItem {project = "project name", dev_hours = 100, mgmt_hours = 5, issue = string.Empty},
