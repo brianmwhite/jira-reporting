@@ -260,7 +260,7 @@ namespace jr.common.Jira
 
         private TempoWorkItemResults GetTempoSearchResultsPaginated(string accountKey, string dateFrom, string dateTo, int startAt, int maxResults)
         {
-            var client = new RestClient(_tempoUrl + "/2/")
+            var client = new RestClient(_tempoUrl + "/core/3/")
             {
                 Authenticator = new JwtAuthenticator(_tempoApiToken)
             };
